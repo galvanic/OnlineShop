@@ -15,12 +15,12 @@ sys.path.append("/Users/jc5809/Dropbox/Programming/Learning Python/My python scr
 from jc import ask
 import re
 from collections import namedtuple
+import csv
 from code import interact
 
-ocadoshop = "first food order ocado.txt"
-flatmates = {"Ben":0.0, "Emily":0.0, "Helena":0.0, "Justine":0.0}
-flatmate_names = flatmates.keys()
-flatmate_names += [name[0] for name in flatmate_names] + ["Ben", "Em"]	# add diminutives in a more thourough manner
+first_shop = "first food order ocado.txt"
+second_shop = "ocado helena shop.txt"
+third_shop = "0609 order.txt"
 
 # make the ShopItem class (= a named tuple)
 ShopItem = namedtuple("ShopItem", "name, price")
@@ -28,53 +28,38 @@ ShopItem = namedtuple("ShopItem", "name, price")
 def powerset(lst): # is this the fastest way to make a powerset ?
 	return reduce(lambda result, x: result +[subset +[x]for subset in result], lst,[[]])
 
+flatmates = {"Ben":0.0, "Emily":0.0, "Helena":0.0, "Justine":0.0}
+flatmate_names = sorted(flatmates.keys(), key=len)
+flatmate_diminutives = flatmate_names + [name[0] for name in flatmate_names] + ["Ben", "Em"]	# add diminutives in a more thorough manner
+# groups = [", ".join(people) for people in powerset(flatmate_names)[1:]]
+# groups = sorted(groups, key=len)
+
 def whoIs(diminutive):
-	for name in flatmates.keys():
-		match = re.search(r"^%s"%diminutive, name)
+	for name in flatmate_names:
+		match = re.search(r"^%s"%diminutive.lower(), name.lower())
 		if match:
 			return name 
 	else:
-		raise ValueError, "We couldn't find the flatmate you are referring to."
+		raise ValueError, "We couldn't find the flatmate '%s' you are referring to."%diminutive
 
-def read_file(filepath):
-	"""
-	"""
-	with open(filepath, "rU") as f:
-		file = f.read()
-		shop_items 	= re.findall(r'(^\d\d?) (.+?) £(\d\d?\.\d\d)', file, re.MULTILINE)
-		other_costs = re.search(r'Delivery\s*£(\d\d?\.\d\d)\n^Voucher Saving\s*£(-?\d\d?.\d\d)', file, re.MULTILINE)
-
-	delivery = float(other_costs.group(1))
-	voucher  = float(other_costs.group(2))
-
-	shop_items = [ShopItem(name, float(price)) for amount, name, price in shop_items for i in range(int(amount))]
-	# need to make function to reformat floated price into a £price
-
-	subtotal = sum([float(item.price) for item in shop_items])
-	total = subtotal + voucher + delivery
-
-	# check that subtotal and total correspond to the text file
-
-	groups = [", ".join(people) for people in powerset(flatmates.keys())[1:]]
-
-	for i, group in enumerate(groups):
-		print i, group
-
-	# ask whose it is
+def askWhose():
 	# should I do this item by item asking whose it is ?
 	# or should I do this per person, each person going though the list agreeing to what is theirs ?
 	for i, item in enumerate(shop_items, 1):
-		if i > 3:
+		if i > 10:
 			break
 
-		who = ask("\nWho bought - %s - ?\t"%(item.name), flatmate_names+map(str, range(15)), "Enter a flatmate name or a value between 0 and 14.")
+		who = ask("Who bought - %s - ?\t"%(item.name), None, "Enter a flatmate name or a value between 0 and 14.")
 		# write this into a file so humans can check later
 
 		# turn string into one of the groups
-		
+		if who.lower() in ["everyone", "ev"]:
+			who = flatmate_names
+		else:
+			who = filter(None, re.findall(r"\w*", who))
 
-		who = groups[int(who)].split(", ")
-		for person in who:
+		# who = groups[int(who)].split(", ")
+		for person in [whoIs(name) for name in who]:
 			# flatmates[person][0].append(item)
 			flatmates[person] += item.price/len(who)
 
@@ -85,24 +70,94 @@ def read_file(filepath):
 
 	# making sure everything adds up, check-point n°2
 
+	print "Each person's total:"
 	for person, total in flatmates.items():
-		print "\n", person, "\t", total, 
+		print person, "\t", total
 
 	# calculating who owes what to who
-	who_payed = ask("\n\nWho payed the shop ?", [name.lower() for name in flatmate_names], "Enter the name of someone living in this flat.")
+	who_payed = ask("\nWho payed the shop ?", [name.lower() for name in flatmate_diminutives], "Enter the name of someone living in this flat.")
 	# easy, it's just the final total of each person
 	# actual difficulty will be in Excel, how to reduce the amount of transactions
 	who_payed = whoIs(who_payed)
 
-	for person in [name for name in flatmates.keys() if name != who_payed]:
+	for person in [name for name in flatmate_names if name != who_payed]:
 		print "\n%s owes %s £%.2f."%(person, who_payed, flatmates[person]),
 
 	print "\n"
 	return
 
+def getShopItems(filepath, write2file=True):
+	"""
+	Finds all the shop items with regular expressions in the
+	confirmation email. Writes them neatly into a csv file.
+	"""
+	with open(filepath, "rU") as f:
+		ifile = f.read()
+		shop_items 	= re.findall(r'(^\d\d?) (.+?) £(\d\d?\.\d\d)', ifile, re.MULTILINE)
+		other_info = re.search(r'^Delivery date\s([\w\d ]+).+?Delivery\s*£(\d\d?\.\d\d)\n^Voucher Saving\s*£(-?\d\d?.\d\d)', ifile, re.MULTILINE | re.DOTALL) # should make this one verbose
+
+	delivery_date = other_info.group(1)
+	delivery = float(other_info.group(2))
+	voucher  = float(other_info.group(3))
+
+	shop_items = [ShopItem(name, float(price)/float(amount)) for amount, name, price in shop_items for i in range(int(amount))]
+	# need to make function to reformat floated price into a £price
+
+	subtotal = sum([float(item.price) for item in shop_items])
+	total = subtotal + voucher + delivery
+
+	# 1st checkpoint: check that subtotal and total correspond to the text file
+
+	# write items into a csv file as they are allocated
+	if write2file:
+		ofilename = "Ocado Shop %s.csv"%(delivery_date)
+		ofile = open(ofilename, "wb")
+		writer = csv.writer(ofile, dialect='excel')
+
+		# title row
+		writer.writerow(["#", "Name", "Price"] + flatmate_names)
+
+		writer.writerow(["0", "Delivery costs", delivery] + ["yes"]*len(flatmate_names))
+		if voucher:
+			writer.writerow(["0", "Voucher savings", voucher] + ["yes"]*len(flatmate_names))
+
+		for i, item in enumerate(shop_items, 1):
+			writer.writerow([i, item.name, item.price] + [""]*len(flatmate_names))
+
+		ofile.close()
+
+	return shop_items
+
+
+def calculateMoneyOwed(filename):
+	with open(filename, "rU") as f:
+		reader = csv.reader(f)
+
+		for i, row in enumerate(reader):
+			if i < 2:
+				continue	# skips header and delivery line (need to refine this to also skip voucher)
+			number, itemname, price, *flatmates = row
+			price = float(price)
+			for name in flatmates:
+				if name:
+					flatmates[name] += price
+
+	print "Each person's total:"
+	for person, total in flatmates.items():
+		print person, "\t", total
+
+	print "\nTotal is £%.2f\n"%sum(flatmates.values())
+
+	return
+
 
 def main():
-	read_file(ocadoshop)
+	getShopItems(third_shop)
+	calculateMoneyOwed("Ocado Shop Monday 7 October.csv")
+
+	# write into file as items are allocated
+	# read new file (if not already in memory) to determine money spent per person
+	# calculate what people owe
 	return
 
 if __name__ == '__main__':
