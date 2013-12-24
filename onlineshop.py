@@ -278,8 +278,14 @@ def main():
 	calculateMoneyOwed(shop_items)
 	return
 
+def thisworks():
+	shopfile = chooseFile()
+	shop_items = getShopItems(shopfile)
+	calculateMoneyOwed(shop_items)
+	return
+
 if __name__ == '__main__':
-	main()
+	thisworks()
 
 """
 Different scenarios of how I'll use this script:
