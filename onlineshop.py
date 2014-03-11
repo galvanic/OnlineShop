@@ -14,19 +14,18 @@ Future improvements:
 """
 import sys
 import os
-sys.path.append("/Users/jc5809/Dropbox/Programming/Learning Python/My python scripts/justine pymodules")
-from jc import ask
+from ask import ask # my function from other file
 import re
 from collections import namedtuple
 import csv
-from code import interact
 
+SHOP_DIRECTORY="shops/"
 
 
 # make the ShopItem class (= a named tuple)
 ShopItem = namedtuple("ShopItem", "name, price, whose")
 
-def powerset(lst): # is this the fastest way to make a powerset ?
+def powerset(lst): # is this the fastest way to make a powerset ? Does it matter ? :p
     return reduce(lambda result, x: result +[subset +[x]for subset in result], lst,[[]])
 
 flatmates = ["Justine", "Emily", "Ben", "Helena"]
@@ -54,21 +53,19 @@ def getLatestFile(filetype):
     Returns a string with the name of the last modified file in
     the current folder.
     """
-    shop_directory = os.getcwd()
-    filelist = [fn for fn in os.listdir(shop_directory) if fn[-3:] == filetype]
+    filelist = [fn for fn in os.listdir(SHOP_DIRECTORY) if fn[-3:] == filetype]
     newest = max(filelist, key=lambda x: os.stat(x).st_mtime)
-    return newest
+    return SHOP_DIRECTORY + newest
 
 def chooseFile():
-    shop_directory = os.getcwd()
-    filelist = [fn for fn in os.listdir(shop_directory) if fn[-3:] in ["txt", "csv"]]
+    filelist = [fn for fn in os.listdir(SHOP_DIRECTORY) if fn[-3:] in ["txt", "csv"]]
     for i, filename in enumerate(filelist, 1):
         print(i, filename)
     f = ask("Which file do you want to open ?", range(1, len(filelist)+1))
     if not f:   # this doesn't work for the moment, can't figure out how to make it accept a None value
         filename = getLatestFile("csv")
     filename = filelist[int(f)-1]
-    return filename
+    return SHOP_DIRECTORY + filename
 
 def findShopItems(filename, write2file=True):
     """
@@ -197,7 +194,7 @@ def askWhose(shop_items, start_line=1):
             break
 
         # turn string into one of the groups
-        if who.lower() in ["everyone", "ev"]:
+        if who.lower() in ["everyone", "ev", "all"]:
             who = "".join(flatmate_initials)
         # else:
             # who = filter(None, re.findall(r"\w*", who)) ??
@@ -274,13 +271,6 @@ def main():
     shop_items = askWhose(shop_items, int(line_start))
     writeShop2File(shop_items, verbose=True)
     displayShop(shop_items)
-    calculateMoneyOwed(shop_items)
-    return
-
-def thisworks():
-    """Only works if csv file is complete"""
-    shopfile = chooseFile()
-    shop_items = getShopItems(shopfile)
     calculateMoneyOwed(shop_items)
     return
 
