@@ -7,23 +7,26 @@ Seems to be problem with an unclosed socket.
 
 from bottle import route, run, template, static_file
 import csv
+from code import interact
+
+
+def getRows(date):
+
+    filepath = "%d.csv" % date
+    with open(filepath, "rU") as file:
+        reader = csv.reader(file)
+        rows = list(reader)
+
+    return rows
 
 
 @route('/')
 @route('/<date:int>')
 def shoplist(date=220114):
 
-    filepath = "%d.csv" % date
-    with open(filepath, "rU") as file:
-        reader = csv.reader(file)
+    rows = getRows(date)
 
-    rows = [row for row in reader]
-
-    from code import interact
-    interact(local=dict( globals(), **locals() ))
-        
-
-    return template("shoplist", date=date, rows=[["Item 1", "Price"]])
+    return template("shoplist", date=date, rows=rows)
 
 
 
