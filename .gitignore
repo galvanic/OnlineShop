@@ -1,3 +1,4 @@
-*.txt
 *.pyc
 shops/
+access.txt
+consumer.txt
