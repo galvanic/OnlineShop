@@ -17,7 +17,7 @@ Delivery date	Monday 23 September
 Order reference	3453272663
 Sub total (estimated)	£149.76
 Picking, Packing and Delivery	£0.00
-Voucher Saving	£-10.00
+Voucher Saving	£0.00
 Total (estimated)	£139.76
 The total cost is estimated because some of the items you might have ordered, such as meat and cheese, are sold by weight. The exact cost will be shown on your receipt when your order is delivered. This cost includes the delivery charge if any.
 You can also view your order and its status online.
@@ -29,59 +29,9 @@ We believe we were the first UK grocery retailer to invest in closed-loop grocer
 Products you've ordered
 Cupboard
 
-2 Andrex Puppies on a Roll Toilet Tissue £8.50
-1 Aussie 3 Minute Miracle Luscious Long Deep Treatment £4.99
-1 Aussie Mega Conditioner £5.99
-1 Aussie Mega Shampoo £5.99
-1 Bart Coriander Paste £1.70
-1 Bart Cumin Seeds £1.75
-1 Bart Fairtrade Organic Ground Turmeric £1.69
-1 Bart Ground Cumin £1.75
-1 Bart Mild Chilli Powder £1.75
-1 Cif Bathroom Spray £2.75
-1 Cif Easy Lift Kitchen Cleaner £3.00
-1 Comfort Pure Fabric Conditioner 42 Wash £2.00
-1 Cooks' Ingredients Organic Herbs De Provence Waitrose £1.59
-1 Cooks' Ingredients Wild Rosemary Waitrose £1.69
-1 Cooks' Ingredients Wild Thyme Waitrose £1.62
-1 Courgettes Waitrose £1.70
-2 Evian Still Action Water £5.78
-1 Fairtrade Bananas essential Waitrose £1.20
-1 Fairtrade Home Ripening Bananas essentials Waitrose £1.39
-2 Fresh Wholemeal Pitta Bread essential Waitrose £1.40
-1 Heinz Tomato Ketchup £2.19
-1 Melitta Four Cup Filter Papers £1.19
-1 Ocado Red Onions £0.80
-1 Oral-B Satin Mint Dental Tape 25m £2.00
-1 Organic Garlic Waitrose £0.84
-1 Persil Small & Mighty Laundry Liquid Colour 40 Wash £10.00
-1 Rombouts Cafe Colombia £2.55
-2 Sanex Dermo Moisturising Shower Gel £3.98
-1 Stabilo Boss Highlighters £2.66
-1 St Ives Blemish Scrub £3.59
-2 Tilda Pure Basmati Rice £3.98
-1 Twinings Pure Peppermint £3.69
-Fridge
-
-2 Edamame, Pea & Wasabi Dip Waitrose £3.38
-2 Ocado Aubergines £3.98
-2 Ocado British Back Bacon Unsmoked, 8 Rashers £3.50
-1 Ocado Extra Mature Cheddar £2.34
-1 Ocado Mixed Weight Free Range Eggs £3.00
-1 Ocado Onions £0.80
-1 Ocado Red Peppers £1.32
-1 Organic Romaine Lettuce Waitrose £1.34
-2 Rich & Smooth Taramasalata Waitrose £2.42
-Freezer
-
-1 Birds Eye Garden Peas £1.00
-1 Breaded Chicken Chunks Frozen Waitrose £3.00
-1 Cooked King Prawns essential Waitrose £3.25
-2 Frozen Raspberries essential Waitrose £4.00
-2 Frozen Strawberry & Banana Smoothie Mix Waitrose Love Life £4.00
-2 Lick Straight-Up Natural Fat-Free Creamy Frozen Yogurt £7.98
-1 McCain Rustic Oven Chips £1.75
-2 Young's 4 Wild Pink Salmon Fillets £7.00
+1 Toilet Tissue £8.50
+1 Chocolate £4.99
+1 Bananas £5.99
 Changing your order
 
 If you want to change any items on your order or change the delivery, simply go to www.ocado.com and the Orders page; from here, click on the order reference number and make the appropriate changes.

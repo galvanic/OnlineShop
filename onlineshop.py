@@ -124,7 +124,7 @@ def writeShop2File(shop_items, ofilename="temp_shop.csv", verbose=False):
 def getShopItems(filename):
     """
     From a csv file,
-    Returns an (ordered) list of ShopItems.
+    Returns an (ordered) list of ShopItems.     # ordered by what ??
     """
     if filename[-3:] == "txt":
         return findShopItems(filename)
