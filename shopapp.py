@@ -4,22 +4,28 @@
 """
 
 import os
+from os.path import join, dirname
 from bottle import route, run, template, get, post, request, static_file
 # import bottle_mysql
 from helper import *
 
+appPath = dirname(__file__)
 
 @route('<filename:re:.*\.js>')
 def javascripts(filename):
-    return static_file(filename, root='static')
+    return static_file(filename, root=join(appPath, 'static'))
 
 @route('<filename:re:.*\.css>')
 def stylesheets(filename):
-    return static_file(filename, root='static')
+    return static_file(filename, root=join(appPath, 'static'))
 
 @route('<filename:re:.*\.(jpg|png|gif|ico)>')
 def images(filename):
-    return static_file(filename, root='static')
+    return static_file(filename, root=join(appPath, 'static'))
+
+@route('/<filename:re:.*\.(eot|ttf|woff|svg)>')
+def fonts(filename):
+    return static_file(filename, root=join(appPath, 'static'))
 
 
 @route('/')
