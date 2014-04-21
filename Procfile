@@ -1,1 +1,1 @@
-web: shopapp.py
+web: python shopapp.py
