@@ -1,1 +1,1 @@
-web: gunicorn shopapp:app
+web: shopapp.py

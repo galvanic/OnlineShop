@@ -38,6 +38,8 @@ def copy_paste_shop(debug=True):
     if debug:
         with open("test_shop.txt", "rU") as ifile:
             default_shop = ifile.read()
+    else:
+        default_shop = ""
     return template("pasteshop", default_shop=default_shop)
 
 
@@ -76,3 +78,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
