@@ -27,8 +27,6 @@ def makeSwedishDate(date_string):
     # first convert input date into a datetime instance
     date = datetime.strptime(" ".join(date_string.split()[1:]), "%d %B") # better way to pop first word off ?
 
-    from code import interact; interact(local=dict( globals(), **locals() ))
-
     # next convert datetime instance into our preferred format
     year = str(datetime.now().year)[-2:] # quick hack, doesn't work if it's an old shop
     time_string = date.strftime("%m%d")
@@ -140,8 +138,6 @@ def calculateMoneyOwed(shop_items):
     for i, item in enumerate(shop_items):
         amount_people = len([char for char in item.whose if char!= " "])
         for j, person in enumerate(item.whose):
-
-            from code import interact; interact(local=dict( globals(), **locals() ))
             if person != " ":
                 flatmates[FLATMATES[j]] += item.price/float(amount_people)
 

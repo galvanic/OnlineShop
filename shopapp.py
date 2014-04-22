@@ -38,10 +38,10 @@ def landing_page():
 
 
 @route('/pasteshop')
-def copy_paste_shop(debug=True):
+def copy_paste_shop(default=True):
     """
     """
-    if debug:
+    if default:
         with open("test_shop.txt", "rU") as ifile:
             default_shop = ifile.read()
     else:

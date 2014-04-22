@@ -3,7 +3,6 @@ import urlparse
 import webbrowser
 from pycascade import cascade
 
-from code import interact
 
 GET_TOKEN_URL = 'https://api.login.yahoo.com/oauth/v2/get_token'
 AUTHORIZATION_URL = 'https://api.login.yahoo.com/oauth/v2/request_auth'
