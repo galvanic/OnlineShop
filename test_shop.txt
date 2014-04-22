@@ -2,8 +2,8 @@
 Print - Close Window
 Subject:	 Confirmation of your order
 From:	 Ocado customer services (customerservices@ocado.com)
-To:	 justinecourty@yahoo.fr;
-Date:	 Sunday, 22 September 2013, 23:46
+To:	 alice@yahoo.com;
+Date:	 Sunday, 27 February 2034, 16:46
 
 
 Dear Ms Courty,
@@ -11,14 +11,14 @@ Dear Ms Courty,
 Thank you for using Ocado to do your shopping.
 
 Order Details
-Delivery address	Latymer Court, Hammersmith Road, London, United Kingdom, W6 7JE.
+Delivery address	London.
 Delivery time	7:30pm - 8:30pm
-Delivery date	Monday 23 September
-Order reference	3453272663
-Sub total (estimated)	£149.76
+Delivery date	Tuesday 29 February
+Order reference	3413262367
+Sub total (estimated)	£19.48
 Picking, Packing and Delivery	£0.00
 Voucher Saving	£0.00
-Total (estimated)	£139.76
+Total (estimated)	£19.48
 The total cost is estimated because some of the items you might have ordered, such as meat and cheese, are sold by weight. The exact cost will be shown on your receipt when your order is delivered. This cost includes the delivery charge if any.
 You can also view your order and its status online.
 
@@ -36,7 +36,7 @@ Changing your order
 
 If you want to change any items on your order or change the delivery, simply go to www.ocado.com and the Orders page; from here, click on the order reference number and make the appropriate changes.
 
-The last time you can change this order is: 01:10 on Monday, 23rd September 2013
+The last time you can change this order is: 15:10 on Saturday, 26 February 2013
 
 
 
