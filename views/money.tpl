@@ -1,24 +1,8 @@
-<!DOCTYPE html>
-<head>
-<title> Split Milk </title>
-		<link href='dist/css/bootstrap.css' rel='stylesheet'>
-		<link href='style.css' rel='stylesheet'>
-</head>
+% rebase base
 
-<body>
-<div class="jumbotron">
-
-	<div class="container">
-		<div class='col-md-2'> <img src="images/smalllogo.png"> </div>
-		<h1> Split Milk </h1>
-	</div>
-
-</div>
-
-<div class="container">
-	<h3>Your {{date}} bill is</h3>
+<h3>Your bill from the {{date}}</h3>
 		
-	<table class='table table-hover'>
+<table>
 
 	% for flatmate, ftotal in money:
 	<tr>
@@ -31,8 +15,4 @@
 		<td>{{total}}</td>
 	</tr>
 
-	</table>
-
-</div>
-
-</body>
+</table>

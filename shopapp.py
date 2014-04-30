@@ -34,7 +34,7 @@ def fonts(filename):
 def landing_page():
     """
     """
-    return template("login") # dummy page -> links to pasteshop
+    return template("index") # dummy page -> links to pasteshop
 
 
 @route('/pasteshop')

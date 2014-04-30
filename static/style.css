@@ -17,7 +17,7 @@ input[type=checkbox] {
     margin:10px;
 }
 
-.jumbotron {background: url(images/banner.jpg);
+#content {background: url(images/banner.jpg);
 			background-size: cover;
 }
 body {background: url(images/background.png);}
