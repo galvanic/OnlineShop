@@ -1,10 +1,15 @@
 % rebase base
 
-<h2>What is Split Milk ?</h2>
+<h2>What is this ?</h2>
 
 <p>
-Split Milk allows you to input your shopping list. You then tell us who bought what and if an item on the shopping list was shared by multiple individuals. We then tell you who owes what taking the hassle and awkwardness out of joint shopping.
-
-<a href="/pasteshop">Give It A Try</a>
-
+This small webapp allows you to easily split a shared online shopping bill, taking the hassle and awkwardness out of joint shopping. It works like this:
+</p>
+<ol>
+	<li>You input your <em>bill</em> (the last confirmation email sent by Ocado) and your <em>flatmates' names</em></li>
+	<li>You input <em>who bought what</em> and if an item was <em>shared by multiple people</em></li>
+	<li>The app tells you <em>who owes what</em></li>
+</ol>
+<p>
+	<a href="/pasteshop">Give It A Try</a>
 </p>

@@ -1,23 +1,62 @@
+
+body {
+    width: 500px;
+    margin: auto;
+}
+
+ol {
+    margin-left: -40px;
+}
+
+em {
+    font-weight: bold;
+    font-style: normal;
+}
+
+a:before {
+    content: "=> ";
+    text-decoration: none;
+    color: black;
+}
+
+label {
+    display: block;
+    margin-top: 20px;
+}
+
+li {
+    padding: 5px;
+}
+
+textarea {
+    width: 400px;
+    height: 300px;
+}
+
+input[type=text] {
+    width: 400px;
+}
+
+input[type=submit] {
+    display: block;
+    margin-top: 20px;
+}
+
 input[type=checkbox]:checked + label {
    background-image: none;
-    background-color:#d0d0d0;
+    background-color: #d0d0d0;
 }
 
 
 input[type=checkbox] + label {
-    display:inline-block;
-    margin:-2px;
+    display: inline-block;
+    margin: -2px;
     padding: 4px 12px;
     background-color: #e7e7e7;
     border-color: #ddd;
 }
 
 input[type=checkbox] {
-    display:none;
-    margin:10px;
+    display: none;
+    margin: 10px;
 }
-
-#content {background: url(images/banner.jpg);
-			background-size: cover;
-}
-body {background: url(images/background.png);}

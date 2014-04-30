@@ -10,7 +10,7 @@
 
 	<header>
 	
-		<h1>Split Milk</h1>
+		<h1></h1>
 
 	</header>
 
