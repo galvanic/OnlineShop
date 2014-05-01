@@ -10,9 +10,6 @@ from collections import namedtuple
 from onlineshop import isEveryItemAssigned
 
 
-FLATMATES = ["Alice", "Bob", "Cass"]
-flatmate_initials = [name[0] for name in FLATMATES]
-
 # make the ShopItem object (= a named tuple)
 ShopItem = namedtuple("ShopItem", "name, price, whose")
 
@@ -33,9 +30,11 @@ def makeSwedishDate(date_string):
     return year + time_string
 
 
-def parseShopText(ifile):
+def parseShopText(ifile, flatmate_names):
     """
     """
+    flatmate_initials = [name[0] for name in flatmate_names]
+
     items = re.findall(r'(^\d\d?) (.+?) £(\d\d?\.\d\d)', ifile, re.MULTILINE)
 
     delivery_date = re.search(r'Delivery date\s([\w\d ]+)', ifile)
@@ -57,14 +56,14 @@ def parseShopText(ifile):
     return shop_items, delivery_date
 
 
-def writeShop2File(shop_items, ofilename, verbose=False):
+def writeShop2File(shop_items, ofilename, flatmate_names, verbose=False):
     """
     """
     with open(ofilename, "w") as ofile:
         writer = csv.writer(ofile, dialect='excel')
 
         # title row
-        writer.writerow(["#", "Name", "Price"] + FLATMATES)
+        writer.writerow(["#", "Name", "Price"] + flatmate_names)
 
         for i, item in enumerate(shop_items):
             who_ordered = []
@@ -80,11 +79,13 @@ def writeShop2File(shop_items, ofilename, verbose=False):
     return
 
 
-def getShopItems(filename):
+def getShopItems(filename, flatmate_names):
     """
     From a csv file,
     Returns an (ordered) list of ShopItems.     # ordered by what ??
     """
+    flatmate_initials = [name[0] for name in flatmate_names]
+
     if filename[-3:] == "txt":
         return findShopItems(filename)
 
@@ -106,16 +107,18 @@ def getShopItems(filename):
     return shop_items
 
 
-def getAssignedShopItems(shop_items, people):
+def getAssignedShopItems(shop_items, people, flatmate_names):
     """
     Returns list of assigned shop items (assigned to housemates).
     """
+    flatmate_initials = [name[0] for name in flatmate_names]
+
     modified_shopitems = list()
 
     for item, who in zip(shop_items, people):
 
         whose = ""
-        for j, person in enumerate(FLATMATES):
+        for j, person in enumerate(flatmate_names):
             if person in who:
                 whose += flatmate_initials[j]
             else: whose += " "
@@ -125,10 +128,10 @@ def getAssignedShopItems(shop_items, people):
     return modified_shopitems
 
 
-def calculateMoneyOwed(shop_items):
+def calculateMoneyOwed(shop_items, flatmate_names):
     """
     """
-    flatmates = {person: 0.0 for person in FLATMATES}
+    flatmates = {person: 0.0 for person in flatmate_names}
 
     # check every item is assigned otherwise, division by zero next
     if not isEveryItemAssigned:
@@ -139,7 +142,7 @@ def calculateMoneyOwed(shop_items):
         amount_people = len([char for char in item.whose if char!= " "])
         for j, person in enumerate(item.whose):
             if person != " ":
-                flatmates[FLATMATES[j]] += item.price/float(amount_people)
+                flatmates[flatmate_names[j]] += item.price/float(amount_people)
 
     return flatmates
 
@@ -152,3 +155,11 @@ def getRows(date):
         reader = csv.reader(file)
         rows = [ row[:3] for row in reader ] 
     return rows
+
+
+
+
+
+
+
+

@@ -54,24 +54,27 @@ def shoplist():
     """
     """
     shoptext = request.forms['shoptext']
-    shop_items, date = parseShopText(shoptext)
-    writeShop2File(shop_items, "%s.csv" % date, verbose=True)
+    flatmate_names = request.forms['flatmate_names'].split()
+    shop_items, date = parseShopText(shoptext, flatmate_names)
+    writeShop2File(shop_items, "%s.csv" % date, flatmate_names, verbose=True)
 
     rows = getRows(date)
 
-    return template("shoplist", date=date, rows=rows[1:], flatmates=list(enumerate(FLATMATES, 1)))
+    return template("shoplist", date=date, rows=rows[1:], flatmates=flatmate_names)
 
 
 @route('/<date>', method="POST")
 def money_owed(date):
     """
     """
-    who = request.forms.dict
-    who = [ who["item%d" % idx] for idx in range(len(who)-1) ]
-    shop_items = getShopItems("%s.csv" % date)
-    shop_items = getAssignedShopItems(shop_items, who)
+    flatmate_names = request.forms['flatmate_names'].split()
+    who = request.forms.dict 
+    who = [ who["item%d" % idx] for idx in range(len(who)-2) ]
+    shop_items = getShopItems("%s.csv" % date, flatmate_names)
+    from code import interact; interact(local=dict( globals(), **locals() ))
+    shop_items = getAssignedShopItems(shop_items, who, flatmate_names)
 
-    flatmates = calculateMoneyOwed(shop_items)
+    flatmates = calculateMoneyOwed(shop_items, flatmate_names)
 
     return template("money", date=date, money=flatmates.items(), total=sum(flatmates.values()))
 

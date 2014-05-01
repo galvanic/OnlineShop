@@ -1,8 +1,15 @@
 % rebase base
 
+<%
+flatmate_names = " ".join(flatmates)
+flatmates = list(enumerate(flatmates, 1))
+%>
+
 <h3> Assign the items to each flatmate</h3>
 
 <form action="/{{date}}" method="post" enctype="multipart/form-data" id="myForm">
+
+	<input type="hidden" id="flatmate_names" name="flatmate_names" value="{{flatmate_names}}" />
 
 	<table>
 
