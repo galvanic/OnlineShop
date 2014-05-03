@@ -71,10 +71,10 @@ def money_owed(date):
     who = request.forms.dict 
     who = [ who["item%d" % idx] for idx in range(len(who)-2) ]
     shop_items = getShopItems("%s.csv" % date, flatmate_names)
-    from code import interact; interact(local=dict( globals(), **locals() ))
     shop_items = getAssignedShopItems(shop_items, who, flatmate_names)
 
     flatmates = calculateMoneyOwed(shop_items, flatmate_names)
+    from code import interact; interact(local=dict( globals(), **locals() ))
 
     return template("money", date=date, money=flatmates.items(), total=sum(flatmates.values()))
 

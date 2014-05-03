@@ -7,6 +7,9 @@
 	% for flatmate, ftotal in money:
 	<tr>
 		<td>{{flatmate}}</td>
+		<%
+		ftotal = "%.2f" % ftotal
+		%>
 		<td>{{ftotal}}</td>
 	</tr>
 	% end

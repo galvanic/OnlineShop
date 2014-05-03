@@ -5,7 +5,7 @@
 <form action="/newshop" method="post" enctype="multipart/form-data" id="myForm">
 
 	<label for="flatmate_names">Enter the names of your flatmates here (seperated by a space):</label>
-	<input type="text" id="flatmate_names" name="flatmate_names" />
+	<input type="text" id="flatmate_names" name="flatmate_names" value="Alice Bob" />
 
 	<label for="shoptext">Paste your Ocado confirmation email here:</label>
 	<textarea id="shoptext" name="shoptext">{{default_shop}}</textarea>
