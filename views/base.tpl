@@ -11,6 +11,9 @@
 	<header>
 	
 		<h1></h1>
+		<p>
+			<a href="/">Back to homepage</a>
+		</p>
 
 	</header>
 

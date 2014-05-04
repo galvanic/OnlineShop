@@ -13,9 +13,8 @@ em {
     font-style: normal;
 }
 
-a:before {
+div#content a:before {
     content: "=> ";
-    text-decoration: none;
     color: black;
 }
 

@@ -74,14 +74,13 @@ def money_owed(date):
     shop_items = getAssignedShopItems(shop_items, who, flatmate_names)
 
     flatmates = calculateMoneyOwed(shop_items, flatmate_names)
-    from code import interact; interact(local=dict( globals(), **locals() ))
 
     return template("money", date=date, money=flatmates.items(), total=sum(flatmates.values()))
 
 
 def main():
     # run(host='localhost', port=8080, debug=True)
-    run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), reloader=True)
     return
 
 
