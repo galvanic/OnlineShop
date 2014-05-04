@@ -6,10 +6,13 @@
 import os
 from os.path import join, dirname
 from bottle import route, run, template, get, post, request, static_file
+import sqlite3
 # import bottle_mysql
-from helper import *
+from helper import ShopItem, makeSwedishDate, parseShopText, getShopItems, getAssignedShopItems, calculateMoneyOwed, getRows
+from models import DB_DIR, createTables
 
 appPath = dirname(__file__)
+createTables()
 
 @route('<filename:re:.*\.js>')
 def javascripts(filename):
@@ -55,12 +58,47 @@ def shoplist():
     """
     shoptext = request.forms['shoptext']
     flatmate_names = request.forms['flatmate_names'].split()
+
+    # add flatmates to database 'person'
+
+    conn = sqlite3.connect('%s/person.db' % DB_DIR)
+    c = conn.cursor()
+    for flatmate_name in flatmate_names:
+        c.execute("INSERT INTO person (name, group_id) VALUES (?, 1)", (flatmate_name,))
+    conn.commit()
+    c.close()
+
+    # fetch shop and its items
+    
     shop_items, date = parseShopText(shoptext, flatmate_names)
-    writeShop2File(shop_items, "%s.csv" % date, flatmate_names, verbose=True)
 
-    rows = getRows(date)
+    # add shop to database 'shop'
 
-    return template("shoplist", date=date, rows=rows[1:], flatmates=flatmate_names)
+    conn = sqlite3.connect('%s/shop.db' % DB_DIR)
+    c = conn.cursor()
+    c.execute("INSERT INTO shop (delivery_date, group_id) VALUES (?, 1)", (int(date),))
+    shop_id = c.lastrowid
+    conn.commit()
+    c.close()
+
+    # add items to database 'item' and 'item_to_shop'
+
+    conn = sqlite3.connect('%s/item.db' % DB_DIR)
+    conn2 = sqlite3.connect('%s/item_to_shop.db' % DB_DIR)
+    c = conn.cursor()
+    c2 = conn2.cursor()
+    for item in shop_items:
+        c.execute("INSERT INTO item (name, price) VALUES (?, ?)", (item.name, item.price))
+        item_id = c.lastrowid
+        c2.execute("INSERT INTO item_to_shop (item_id, shop_id) VALUES (?, ?)", (item_id, shop_id))
+    conn.commit()
+    conn2.commit()
+    c.close()
+    c2.close()
+
+    rows = getRows(shop_id)
+
+    return template("shoplist", date=date, rows=rows, flatmates=flatmate_names)
 
 
 @route('/<date>', method="POST")
@@ -80,7 +118,7 @@ def money_owed(date):
 
 def main():
     # run(host='localhost', port=8080, debug=True)
-    run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), reloader=True)
+    run(host="0.0.0.0", port=int(os.environ.get("PORT", 5001)), reloader=True)
     return
 
 

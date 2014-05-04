@@ -8,7 +8,8 @@ import re
 import csv
 from collections import namedtuple
 from onlineshop import isEveryItemAssigned
-
+import sqlite3
+from models import DB_DIR
 
 # make the ShopItem object (= a named tuple)
 ShopItem = namedtuple("ShopItem", "name, price, whose")
@@ -147,14 +148,32 @@ def calculateMoneyOwed(shop_items, flatmate_names):
     return flatmates
 
 
-def getRows(date):
+def getRows(shop_id):
     """
+    Get the name and price of all the items which are in the shop with that shop_id
     """
-    filepath = "%s.csv" % date
-    with open(filepath, "rU") as file:
-        reader = csv.reader(file)
-        rows = [ row[:3] for row in reader ] 
-    return rows
+    conn = sqlite3.connect('%s/item_to_shop.db' % DB_DIR)
+    c = conn.cursor()
+    c.execute("SELECT item_id FROM item_to_shop WHERE shop_id = ?", (shop_id,))
+    item_ids = c.fetchall()
+    c.close()
+
+    item_ids = list(zip(*item_ids))[0] # not very clean
+
+    conn = sqlite3.connect('%s/item.db' % DB_DIR)
+    c = conn.cursor()
+    all_item_info = []
+    for item_id in item_ids:
+        c.execute("SELECT name, price FROM item WHERE id = ?", (item_id,))
+        item_info = c.fetchall()
+        item_info = item_info[0]    # ok, I'm missing something here, it must be something else than fetchall()
+        all_item_info.append(item_info)
+    c.close()
+
+    r = [list(range(1, len(item_ids)+1)), ]
+    data = zip(*(r + list(zip(*all_item_info))))
+
+    return data
 
 
 
