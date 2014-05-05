@@ -8,7 +8,7 @@ from os.path import join, dirname
 from bottle import route, run, template, get, post, request, static_file
 import sqlite3
 # import bottle_mysql
-from helper import ShopItem, makeSwedishDate, parseShopText, getShopID, getShopItems, assignShopItems, calculateMoneyOwed
+from helper import ShopItem, getShopsInfo, makeSwedishDate, parseShopText, getShopID, getShopItems, assignShopItems, calculateMoneyOwed
 from models import DB_DIR, createTables
 
 appPath = dirname(__file__)
@@ -38,7 +38,8 @@ def fonts(filename):
 def landing_page():
     """
     """
-    return template("index") # dummy page -> links to pasteshop
+    shops = getShopsInfo(GROUP_ID, "delivery_date")
+    return template("index", shops=shops)
 
 
 @route('/pasteshop')

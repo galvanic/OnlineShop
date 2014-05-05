@@ -55,6 +55,21 @@ def parseShopText(ifile, flatmate_names):
     return shop_items, delivery_date
 
 
+def getShopsInfo(group_id, info="id"):
+    """
+    """
+    conn = sqlite3.connect('%s/shop.db' % DB_DIR)
+    c = conn.cursor()
+    c.execute("SELECT %s FROM shop WHERE group_id = ?" % info, (group_id, ))
+    shops = c.fetchall()
+    c.close()
+
+    if shops:
+        return list(zip(*shops))[0]
+    else:
+        return
+
+
 def getFlatmateInfo(group_id=None, shop_id=None, info="id"):
     """
     """
