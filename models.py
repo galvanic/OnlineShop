@@ -60,3 +60,5 @@ def createTables():
 	return group_id
 
 
+if __name__ == '__main__':
+	createTables()

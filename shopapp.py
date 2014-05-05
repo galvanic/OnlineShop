@@ -9,10 +9,9 @@ from bottle import route, run, template, get, post, request, static_file
 import sqlite3
 # import bottle_mysql
 from helper import ShopItem, getShopsInfo, makeSwedishDate, parseShopText, getShopID, getShopItems, assignShopItems, calculateMoneyOwed
-from models import DB_DIR, createTables
+from models import DB_DIR
 
 appPath = dirname(__file__)
-createTables()
 GROUP_ID = 1
 
 @route('<filename:re:.*\.js>')
