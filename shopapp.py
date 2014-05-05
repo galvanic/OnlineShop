@@ -8,11 +8,12 @@ from os.path import join, dirname
 from bottle import route, run, template, get, post, request, static_file
 import sqlite3
 # import bottle_mysql
-from helper import ShopItem, makeSwedishDate, parseShopText, getShopItems, getAssignedShopItems, calculateMoneyOwed, getRows
+from helper import ShopItem, makeSwedishDate, parseShopText, getShopID, getShopItems, assignShopItems, calculateMoneyOwed
 from models import DB_DIR, createTables
 
 appPath = dirname(__file__)
 createTables()
+GROUP_ID = 1
 
 @route('<filename:re:.*\.js>')
 def javascripts(filename):
@@ -53,18 +54,21 @@ def copy_paste_shop(default=True):
 
 
 @route('/newshop', method="POST")
-def shoplist():
+def shoplist(group_id=GROUP_ID):
     """
     """
     shoptext = request.forms['shoptext']
     flatmate_names = request.forms['flatmate_names'].split()
 
-    # add flatmates to database 'person'
+    # add flatmates to database 'person' and keep ids
+
+    flatmates = {}
 
     conn = sqlite3.connect('%s/person.db' % DB_DIR)
     c = conn.cursor()
     for flatmate_name in flatmate_names:
-        c.execute("INSERT INTO person (name, group_id) VALUES (?, 1)", (flatmate_name,))
+        c.execute("INSERT INTO person (name, group_id) VALUES (?, ?)", (flatmate_name, group_id))
+        flatmates[flatmate_name] = c.lastrowid
     conn.commit()
     c.close()
 
@@ -76,7 +80,7 @@ def shoplist():
 
     conn = sqlite3.connect('%s/shop.db' % DB_DIR)
     c = conn.cursor()
-    c.execute("INSERT INTO shop (delivery_date, group_id) VALUES (?, 1)", (int(date),))
+    c.execute("INSERT INTO shop (delivery_date, group_id) VALUES (?, ?)", (int(date), group_id))
     shop_id = c.lastrowid
     conn.commit()
     c.close()
@@ -96,29 +100,36 @@ def shoplist():
     c.close()
     c2.close()
 
-    rows = getRows(shop_id)
+    rows = getShopItems(shop_id)
 
-    return template("shoplist", date=date, rows=rows, flatmates=flatmate_names)
+    return template(
+        "shoplist",
+        date=date,
+        rows=enumerate(rows),
+        flatmates=flatmates.items()
+        )
 
 
 @route('/<date>', method="POST")
-def money_owed(date):
+def money_owed(date, group_id=GROUP_ID):
     """
     """
-    flatmate_names = request.forms['flatmate_names'].split()
-    who = request.forms.dict 
-    who = [ who["item%d" % idx] for idx in range(len(who)-2) ]
-    shop_items = getShopItems("%s.csv" % date, flatmate_names)
-    shop_items = getAssignedShopItems(shop_items, who, flatmate_names)
+    who = request.forms.dict
+    who.pop('submit', None) # could pop anything that wasn't 'item'
+    who = who.items()
+    who = sorted(who, key=lambda x: x[0])
 
-    flatmates = calculateMoneyOwed(shop_items, flatmate_names)
+    shop_id = getShopID(date, group_id)
+    assignShopItems(shop_id, who)
+
+    flatmates = calculateMoneyOwed(shop_id)
 
     return template("money", date=date, money=flatmates.items(), total=sum(flatmates.values()))
 
 
 def main():
     # run(host='localhost', port=8080, debug=True)
-    run(host="0.0.0.0", port=int(os.environ.get("PORT", 5001)), reloader=True)
+    run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
     return
 
 
