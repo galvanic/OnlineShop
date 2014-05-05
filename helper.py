@@ -8,10 +8,11 @@ import re
 import csv
 from collections import namedtuple
 from onlineshop import isEveryItemAssigned
-
+import sqlite3
+from models import DB_DIR
 
 # make the ShopItem object (= a named tuple)
-ShopItem = namedtuple("ShopItem", "name, price, whose")
+ShopItem = namedtuple("ShopItem", "item_id, name, price")
 
 
 def makeSwedishDate(date_string):
@@ -33,8 +34,6 @@ def makeSwedishDate(date_string):
 def parseShopText(ifile, flatmate_names):
     """
     """
-    flatmate_initials = [name[0] for name in flatmate_names]
-
     items = re.findall(r'(^\d\d?) (.+?) £(\d\d?\.\d\d)', ifile, re.MULTILINE)
 
     delivery_date = re.search(r'Delivery date\s([\w\d ]+)', ifile)
@@ -48,113 +47,162 @@ def parseShopText(ifile, flatmate_names):
     voucher = float(voucher.group(1))
 
     shop_items = []
-    shop_items.append(ShopItem("Delivery costs", delivery_price, "".join(flatmate_initials)))
+    shop_items.append(ShopItem(0, "Delivery costs", delivery_price))
     if voucher:
-        shop_items.append(ShopItem("Voucher savings", voucher, "".join(flatmate_initials)))
+        shop_items.append(ShopItem(0, "Voucher savings", voucher))
 
-    shop_items += [ShopItem(name, float(price)/float(amount), "") for amount, name, price in items for i in range(int(amount))]
+    shop_items += [ShopItem(0, name, float(price)/float(amount)) for amount, name, price in items for i in range(int(amount))]
     return shop_items, delivery_date
 
 
-def writeShop2File(shop_items, ofilename, flatmate_names, verbose=False):
+def getShopsInfo(group_id, info="id"):
     """
     """
-    with open(ofilename, "w") as ofile:
-        writer = csv.writer(ofile, dialect='excel')
+    conn = sqlite3.connect('%s/shop.db' % DB_DIR)
+    c = conn.cursor()
+    c.execute("SELECT %s FROM shop WHERE group_id = ?" % info, (group_id, ))
+    shops = c.fetchall()
+    c.close()
 
-        # title row
-        writer.writerow(["#", "Name", "Price"] + flatmate_names)
-
-        for i, item in enumerate(shop_items):
-            who_ordered = []
-            # this assumes whose is ordered
-            for initial in item.whose:
-                if initial != " ":
-                    who_ordered.append("yes")
-                else:
-                    who_ordered.append("")
-            writer.writerow([i, item.name, item.price] + who_ordered)
-    if verbose:
-        print("\nWritten to file %s.\n"%(ofilename))
-    return
+    if shops:
+        return list(zip(*shops))[0]
+    else:
+        return
 
 
-def getShopItems(filename, flatmate_names):
+def getFlatmateInfo(group_id=None, shop_id=None, info="id"):
     """
-    From a csv file,
-    Returns an (ordered) list of ShopItems.     # ordered by what ??
     """
-    flatmate_initials = [name[0] for name in flatmate_names]
+    if not group_id:
+        group_id = getGroupID(shop_id)
 
-    if filename[-3:] == "txt":
-        return findShopItems(filename)
+    conn = sqlite3.connect('%s/person.db' % DB_DIR)
+    c = conn.cursor()
+    c.execute("SELECT %s FROM person WHERE group_id = ?" % info, (group_id, ))
+    flatmate_info = c.fetchall()
+    c.close()
 
-    shop_items = list()
-    with open(filename, "rU") as f:
-        csv_reader = csv.reader(f)
-        for i, row in enumerate(csv_reader):
-            number, itemname, price, *flatmate_headers = row
-            if i == 0:
-                continue    # skips header
-            whose = ""
-            for j, name in enumerate(flatmate_headers):
-                if name:
-                    whose += flatmate_initials[j]
-                else:
-                    whose += " "
-            s = ShopItem(itemname, float(price), whose)
-            shop_items.append(s)
+    flatmate_info = list(zip(*flatmate_info))[0] # not very clean
+
+    return flatmate_info
+
+
+def getFlatmateName(person_id):
+    """
+    """
+    conn = sqlite3.connect('%s/person.db' % DB_DIR)
+    c = conn.cursor()
+    c.execute("SELECT name FROM person WHERE id = ?", (person_id, ))
+    flatmate_name = c.fetchone()
+    c.close()
+
+    return flatmate_name[0]
+
+
+def getShopID(delivery_date, group_id):
+    """
+    """
+    conn = sqlite3.connect('%s/shop.db' % DB_DIR)
+    c = conn.cursor()
+    c.execute("SELECT id FROM shop WHERE group_id = ? AND delivery_date = ?", (group_id, int(delivery_date)))
+    shop_id = c.fetchone()
+    c.close()
+
+    return shop_id[0]
+
+
+def getGroupID(shop_id):
+    """
+    """
+    conn = sqlite3.connect('%s/shop.db' % DB_DIR)
+    c = conn.cursor()
+    c.execute("SELECT group_id FROM shop WHERE id = ?", (shop_id, ))
+    group_id = c.fetchone()
+    c.close()
+
+    return group_id[0]
+
+
+def getShopItems(shop_id):
+    """
+    Returns a list of ShopItems.
+    """
+    # get shop items
+    conn = sqlite3.connect('%s/item_to_shop.db' % DB_DIR)
+    c = conn.cursor()
+    c.execute("SELECT item_id FROM item_to_shop WHERE shop_id = ?", (shop_id,))
+    item_ids = c.fetchall()
+    c.close()
+
+    item_ids = list(zip(*item_ids))[0] # not very clean
+
+    conn = sqlite3.connect('%s/item.db' % DB_DIR)
+    c = conn.cursor()
+    shop_items = []
+    for item_id in item_ids:
+        c.execute("SELECT name, price FROM item WHERE id = ?", (item_id,))
+        item_info = c.fetchall()
+        name, price = item_info[0]    # ok, I'm missing something here, it must be something else than fetchall()
+        shop_items.append((item_id, name, price))
+    c.close()
+
+    shop_items = [ShopItem(item_id, name, price) for item_id, name, price in shop_items]
+
     return shop_items
 
 
-def getAssignedShopItems(shop_items, people, flatmate_names):
-    """
-    Returns list of assigned shop items (assigned to housemates).
-    """
-    flatmate_initials = [name[0] for name in flatmate_names]
-
-    modified_shopitems = list()
-
-    for item, who in zip(shop_items, people):
-
-        whose = ""
-        for j, person in enumerate(flatmate_names):
-            if person in who:
-                whose += flatmate_initials[j]
-            else: whose += " "
-
-        modified_shopitems.append(ShopItem(item.name, item.price, whose))
-
-    return modified_shopitems
-
-
-def calculateMoneyOwed(shop_items, flatmate_names):
+def assignShopItems(shop_id, who):
     """
     """
-    flatmates = {person: 0.0 for person in flatmate_names}
+    # add assigned items to database 'item_to_shop_to_person'
+    conn = sqlite3.connect('%s/item_to_shop_to_person.db' % DB_DIR)
+    c = conn.cursor()
 
-    # check every item is assigned otherwise, division by zero next
-    if not isEveryItemAssigned:
-        # make this into raising an exception?
-        raise ValueError
+    for item_id, people in who:
+        for person_id in people:
+            c.execute("INSERT INTO item_to_shop_to_person (item_id, shop_id, person_id) VALUES (?, ?, ?)",
+                (item_id, shop_id, person_id))
+    conn.commit()
+    c.close()
 
-    for i, item in enumerate(shop_items):
-        amount_people = len([char for char in item.whose if char!= " "])
-        for j, person in enumerate(item.whose):
-            if person != " ":
-                flatmates[flatmate_names[j]] += item.price/float(amount_people)
+    return
+
+
+def calculateMoneyOwed(shop_id):
+    """
+    """
+    group_id = getGroupID(shop_id)
+    flatmate_ids = getFlatmateInfo(group_id=group_id, info="id")
+    flatmates = {person: 0.0 for person in flatmate_ids}
+
+    # let's just assume every item is assigned so there won't be a zero division error later
+
+    # get the price of each item which is connected to this shop
+    shop_items = getShopItems(shop_id)
+
+    for item in shop_items:
+
+        # get how many times that item appears and the people ids
+        conn = sqlite3.connect('%s/item_to_shop_to_person.db' % DB_DIR)
+        c = conn.cursor()
+        c.execute("SELECT person_id FROM item_to_shop_to_person WHERE item_id = ? AND shop_id = ?",
+            (item.item_id, shop_id))
+        person_ids = c.fetchall()
+        c.close()
+
+        person_ids = list(zip(*person_ids))[0]
+
+        amount_people = len(person_ids)
+
+        for person in person_ids:
+            flatmates[person] += item.price/float(amount_people)
+
+    # turn id into name
+    flatmates = {getFlatmateName(person_id): owes for person_id, owes in flatmates.items()}
 
     return flatmates
 
 
-def getRows(date):
-    """
-    """
-    filepath = "%s.csv" % date
-    with open(filepath, "rU") as file:
-        reader = csv.reader(file)
-        rows = [ row[:3] for row in reader ] 
-    return rows
 
 
 

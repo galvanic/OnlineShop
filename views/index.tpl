@@ -1,5 +1,6 @@
 % rebase base
 
+
 <h2>What is this ?</h2>
 
 <p>
@@ -13,3 +14,15 @@ This small webapp allows you to easily split a shared online shopping bill, taki
 <p>
 	<a href="/pasteshop">Give It A Try</a>
 </p>
+
+
+% if shops:
+
+	<h2>Your Previous Shops</h2>
+	<ol>
+	% for shop_date in shops:
+		<li><a href="#">{{shop_date}}</a></li>
+	% end
+	</ol>
+
+% end

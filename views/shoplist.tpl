@@ -1,15 +1,9 @@
 % rebase base
 
-<%
-flatmate_names = " ".join(flatmates)
-flatmates = list(enumerate(flatmates, 1))
-%>
 
 <h3> Assign the items to each flatmate</h3>
 
 <form action="/{{date}}" method="post" enctype="multipart/form-data" id="myForm">
-
-	<input type="hidden" id="flatmate_names" name="flatmate_names" value="{{flatmate_names}}" />
 
 	<table>
 
@@ -19,15 +13,15 @@ flatmates = list(enumerate(flatmates, 1))
 			<th> People </th>
 		</tr>
 
-		% for idx, name, price in rows:
+		% for idx, item in rows:
 		<tr>
-			<td>{{idx}}. {{name}}</td>
-			<td>{{price}}</td>
+			<td>{{idx}}. {{item.name}}</td>
+			<td>{{item.price}}</td>
 			<td>
 
-				% for fidx, flatmate in flatmates:
-				<input type="checkbox" id="{{idx}}{{flatmate}}" name="item{{idx}}" value="{{flatmate}}">
-				<label for="{{idx}}{{flatmate}}">{{flatmate}}</label>
+				% for name, person_id in flatmates:
+				<input type="checkbox" id="{{idx}}{{name}}" name="{{item.item_id}}" value="{{person_id}}">
+				<label for="{{idx}}{{name}}">{{name}}</label>
 				% end
 
 			</td>
