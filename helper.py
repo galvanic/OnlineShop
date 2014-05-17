@@ -7,7 +7,7 @@ from datetime import datetime
 import re
 import csv
 from collections import namedtuple
-from onlineshop import isEveryItemAssigned
+from cli import isEveryItemAssigned
 import sqlite3
 from models import DB_DIR
 
