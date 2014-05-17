@@ -1,5 +1,5 @@
 """
-Django settings for onlineshop project.
+Django settings for flatmates_project project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.6/topics/settings/
@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '-ys=*zeii8w-8uc07z6z@cf^o)j%wfb-%--i*dm7!&!kv$39s6'
+SECRET_KEY = '1o6j9k15*_&l^@xim2lpsbkbr+e(y8p4i+l&d2z!9*hq=g_uz8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -29,15 +29,24 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = (
+DEFAULT_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'south'
 )
+
+THIRD_PARTY_APPS = (
+    'south',
+)
+
+LOCAL_APPS = (
+    'helper',
+)
+
+INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -48,9 +57,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'onlineshop.urls'
+ROOT_URLCONF = 'flatmates_project.urls'
 
-WSGI_APPLICATION = 'onlineshop.wsgi.application'
+WSGI_APPLICATION = 'flatmates_project.wsgi.application'
 
 
 # Database

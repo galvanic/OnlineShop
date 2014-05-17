@@ -1,5 +1,5 @@
 """
-WSGI config for onlineshop project.
+WSGI config for flatmates_project project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -8,7 +8,7 @@ https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 """
 
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "onlineshop.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "flatmates_project.settings")
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
