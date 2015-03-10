@@ -4,3 +4,4 @@ access.txt
 consumer.txt
 *.csv
 db*
+.todo*
