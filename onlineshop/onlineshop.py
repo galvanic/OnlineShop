@@ -79,7 +79,7 @@ def assign_purchase(purchase):
     by seperating their UID by a space.
     """
     purchasers = ask('Who bought   {0.amount} {0.name}   {1:<10}'.format(purchase, '?'), None, '')
-    return purchasers
+    return purchasers.split()
 
 
 def calculate_money_spent_by_each(baskets):
@@ -109,12 +109,9 @@ def main(receipt_filepath):
     for index, purchase in enumerate(purchases, 1):
         if purchase.price == 0:
             continue
-
-        purchasers = assign_purchase(purchase)
-        purchasers = purchasers.split()
-
         cost_each = purchase.price / float(purchase.amount)
 
+        purchasers = assign_purchase(purchase)
         for person in purchasers:
             if person in people:
                 people[person].append(cost_each)
