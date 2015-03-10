@@ -19,7 +19,7 @@ import re
 from collections import namedtuple
 import csv
 
-SHOP_DIRECTORY="../data/shops/"
+SHOP_DIRECTORY="../data/receipts/"
 
 
 def get_latest_file(file_extension, directory=SHOP_DIRECTORY):

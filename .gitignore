@@ -1,5 +1,5 @@
 *.pyc
-shops/
+data/
 access.txt
 consumer.txt
 *.csv
