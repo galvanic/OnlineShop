@@ -16,7 +16,7 @@ Delivery time	7:30pm - 8:30pm
 Delivery date	Tuesday 29 March
 Order reference	3413262367
 Sub total (estimated)	£19.48
-Picking, Packing and Delivery	£0.00
+Picking, Packing and Delivery	£1.06
 Voucher Saving	£0.00
 Total (estimated)	£19.48
 The total cost is estimated because some of the items you might have ordered, such as meat and cheese, are sold by weight. The exact cost will be shown on your receipt when your order is delivered. This cost includes the delivery charge if any.
@@ -29,7 +29,7 @@ We believe we were the first UK grocery retailer to invest in closed-loop grocer
 Products you've ordered
 Cupboard
 
-1 Toilet Tissue £8.50
+1 Milk £8.50
 1 Chocolate £4.99
 1 Bananas £5.99
 Changing your order
