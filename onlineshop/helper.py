@@ -1,3 +1,6 @@
+# coding: utf-8
+
+import os
 import sys
 
 
@@ -37,3 +40,15 @@ def ask(question, rangeList=['y','yes','oui'], errorText='Enter another value.')
             continue
         break
     return user
+
+
+def get_latest_file(directory, file_extension='txt'):
+    """
+    Returns a string with the filepath of the last modified file in
+    the given directory.
+    """
+    filenames = ['{}{}'.format(directory, fn) for fn in os.listdir(directory)
+        if fn[-3:] == file_extension]
+    newest = max(filenames, key=lambda x: os.stat(x).st_mtime)
+    return newest
+
