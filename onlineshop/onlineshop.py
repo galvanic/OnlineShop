@@ -71,13 +71,25 @@ def parse_receipt(receipt_filepath):
 
 
 def assign_purchase(purchase):
-    """"""
+    """
+    Given an item, prints the amount and name of the purchase, waits
+    for user input and returns a list of purchasers' UIDs.
+    User input is expected to be anything that would uniquely identify a
+    flatmate (from the other flatmates). Multiple flatmates can be entered
+    by seperating their UID by a space.
+    """
     purchasers = ask('Who bought   {0.amount} {0.name}   {1:<10}'.format(purchase, '?'), None, '')
     return purchasers
 
 
 def calculate_money_spent_by_each(baskets):
-    """"""
+    """
+    Given a dictionary (flatmate UID: their cost share of each of
+    their purchases), return a dictionary (flatmate UID: their total
+    share of the order bill).
+
+    TODO: need better name for this function
+    """
     baskets = {person:sum(purchases) for person, purchases in baskets.items()}
     return baskets
 
