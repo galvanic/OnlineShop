@@ -3,5 +3,5 @@ data/
 access.txt
 consumer.txt
 *.csv
-db*
+*.db
 .todo*

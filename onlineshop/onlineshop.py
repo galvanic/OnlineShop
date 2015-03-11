@@ -26,9 +26,15 @@ from collections import namedtuple
 import sqlite3
 
 from helper import ask, get_latest_file
+from db_helper import DB_FILE,\
+                      add_new_order,\
+                      add_new_purchase,\
+                      add_new_purchases,\
+                      add_new_flatmate,\
+                      add_new_basket_item,\
+                      get_flatmate_id
 
 RECEIPT_DIRECTORY = '../data/receipts/'
-DB_FILE = '../data/onlineshop.db'
 
 Purchase = namedtuple('Purchase', 'description, price, quantity')
 
@@ -103,8 +109,8 @@ def main(receipt_filepath):
 
     order_info, purchases = parse_receipt(receipt_filepath)
 
-    conn = sqlite3.connect(DB_FILE)
-    curs = conn.cursor()
+    conn = sqlite3.connect(DB_FILE) #
+    order_id = add_new_order(order_info, conn) #
 
     try:
         ## assign all purchases
@@ -113,6 +119,8 @@ def main(receipt_filepath):
 
         baskets = {}
         for index, purchase in enumerate(purchases, 1):
+            purchase_id = add_new_purchase(purchase, order_id, conn) #
+
             if purchase.price == 0:
                 continue
 
@@ -122,8 +130,11 @@ def main(receipt_filepath):
             for flatmate in purchasers:
                 if flatmate not in baskets:
                     baskets[flatmate] = [cost_each]
+                    flatmate_id = add_new_flatmate(flatmate, conn) #
                 else:
                     baskets[flatmate].append(cost_each)
+                    flatmate_id = get_flatmate_id(flatmate, conn) #
+                basket_item_id = add_new_basket_item(purchase_id, flatmate_id, conn) #
 
         ## display how much each flatmate owes for the shop order
         for flatmate, owes in divide_order_bill(baskets).items():
@@ -133,7 +144,7 @@ def main(receipt_filepath):
         pass
 
     finally:
-        curs.close()
+        conn.close() #
 
     return
 
