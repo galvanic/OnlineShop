@@ -30,7 +30,7 @@ from helper import ask, get_latest_file
 RECEIPT_DIRECTORY = '../data/receipts/'
 DB_FILE = '../data/onlineshop.db'
 
-Purchase = namedtuple('Purchase', 'name, price, quantity')
+Purchase = namedtuple('Purchase', 'description, price, quantity')
 
 
 def parse_receipt(receipt_filepath):
@@ -54,8 +54,8 @@ def parse_receipt(receipt_filepath):
         voucher = re.search(r'Voucher Saving\s.(-?\d\d?.\d\d)', ifile)
         voucher = float(voucher.group(1))
 
-    purchases = [Purchase(name, float(price), int(quantity)) 
-        for quantity, name, price in purchases]
+    purchases = [Purchase(description, float(price), int(quantity))
+        for quantity, description, price in purchases]
 
     purchases.append(Purchase('Delivery costs', delivery_cost, 1))
     if voucher:
@@ -65,11 +65,8 @@ def parse_receipt(receipt_filepath):
     total = subtotal + voucher + delivery_cost
 
     order_info = {
-        'total': total,
-        'subtotal': subtotal,
-        'voucher': voucher,
-        'delivery cost': delivery_cost,
         'delivery date': delivery_date,
+        'total': total,
     }
 
     return order_info, purchases
@@ -77,13 +74,13 @@ def parse_receipt(receipt_filepath):
 
 def assign_purchase(purchase):
     """
-    Given an item, prints the quantity and name of the purchase, waits
+    Given an item, prints the quantity and description of the purchase, waits
     for user input and returns a list of purchasers' UIDs.
     User input is expected to be anything that would uniquely identify a
     flatmate (from the other flatmates). Multiple flatmates can be entered
     by seperating their UID by a space.
     """
-    purchasers = ask('Who bought   {0.quantity} {0.name}   {1:<10}'.format(purchase, '?'), None, '')
+    purchasers = ask('Who bought   {0.quantity} {0.description}   {1:<10}'.format(purchase, '?'), None, '')
     return purchasers.split()
 
 
@@ -95,7 +92,7 @@ def divide_order_bill(baskets):
 
     TODO: need better name for this function
     """
-    baskets = {person:sum(purchases) for person, purchases in baskets.items()}
+    baskets = {flatmate:sum(purchases) for flatmate, purchases in baskets.items()}
     return baskets
 
 
@@ -118,18 +115,19 @@ def main(receipt_filepath):
         for index, purchase in enumerate(purchases, 1):
             if purchase.price == 0:
                 continue
+
             cost_each = purchase.price / float(purchase.quantity)
 
             purchasers = assign_purchase(purchase)
-            for person in purchasers:
-                if person in baskets:
-                    baskets[person].append(cost_each)
+            for flatmate in purchasers:
+                if flatmate not in baskets:
+                    baskets[flatmate] = [cost_each]
                 else:
-                    baskets[person] = [cost_each]
+                    baskets[flatmate].append(cost_each)
 
-        ## display how much each person owes for the shop order
-        for person, owes in divide_order_bill(baskets).items():
-            print('{} spent £{:.2f}'.format(person, owes))
+        ## display how much each flatmate owes for the shop order
+        for flatmate, owes in divide_order_bill(baskets).items():
+            print('{} spent £{:.2f}'.format(flatmate, owes))
 
     except KeyboardInterrupt:
         pass
