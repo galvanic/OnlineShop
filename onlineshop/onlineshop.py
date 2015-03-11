@@ -24,6 +24,7 @@ import click
 import datetime as dt
 from collections import namedtuple
 import sqlite3
+import logging
 
 from helper import ask, get_latest_file
 from db_helper import DB_FILE,\
@@ -106,11 +107,17 @@ def main(receipt_filepath):
     """"""
     if not receipt_filepath:
         receipt_filepath = get_latest_file(RECEIPT_DIRECTORY)
+        logging.info('No receipt given, got latest: {}'.format(receipt_filepath))
 
     order_info, purchases = parse_receipt(receipt_filepath)
+    logging.info('Order was delivered on {}'.format(order_info['delivery date']))
+    logging.info('There were {} items purchased for a total of £{:.2f}'.format(
+        len(purchases), order_info['total']))
 
     conn = sqlite3.connect(DB_FILE) #
+    logging.debug('Connected to database')
     order_id = add_new_order(order_info, conn) #
+    logging.debug('Order added: ID {}'.format(order_id))
 
     try:
         ## assign all purchases
@@ -120,6 +127,7 @@ def main(receipt_filepath):
         baskets = {}
         for index, purchase in enumerate(purchases, 1):
             purchase_id = add_new_purchase(purchase, order_id, conn) #
+            logging.debug('Purchase added: ID {}'.format(purchase_id))
 
             if purchase.price == 0:
                 continue
@@ -130,11 +138,15 @@ def main(receipt_filepath):
             for flatmate in purchasers:
                 if flatmate not in baskets:
                     baskets[flatmate] = [cost_each]
+                    logging.debug('New flatmate: {}'.format(flatmate))
                     flatmate_id = add_new_flatmate(flatmate, conn) #
+                    logging.debug('Flatmate added: ID {}'.format(flatmate_id))
                 else:
                     baskets[flatmate].append(cost_each)
                     flatmate_id = get_flatmate_id(flatmate, conn) #
+                    logging.debug('Got {}\'s ID: {}'.format(flatmate, flatmate_id))
                 basket_item_id = add_new_basket_item(purchase_id, flatmate_id, conn) #
+                logging.debug('Basket item added: ID {}'.format(basket_item_id))
 
         ## display how much each flatmate owes for the shop order
         for flatmate, owes in divide_order_bill(baskets).items():
@@ -153,7 +165,18 @@ def main(receipt_filepath):
 @click.option('receipt_filepath', '-i', '--receipt',    default=None,
                                                         type=click.Path(exists=True),
                                                         help='Input filepath.')
-def cli(*args, **kwargs):
+@click.option('debug', '--debug', is_flag=True)
+@click.option('info',  '--info',  is_flag=True)
+def cli(debug, info, *args, **kwargs):
+
+    if debug:
+        log_level = logging.DEBUG
+    elif info:
+        log_level = logging.INFO
+    else:
+        log_level = logging.WARN
+    logging.basicConfig(level=log_level)
+
     return main(*args, **kwargs)
 
 
