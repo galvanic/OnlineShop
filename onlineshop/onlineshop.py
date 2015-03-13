@@ -163,6 +163,7 @@ def main(receipt_filepath):
 
     finally:
         conn.close() #
+        logging.debug('Closed db connection.')
 
     return
 
