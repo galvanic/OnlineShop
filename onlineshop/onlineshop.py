@@ -34,6 +34,7 @@ from db_helper import DB_FILE,\
                       add_new_flatmate,\
                       add_new_basket_item,\
                       get_flatmate_id,\
+                      get_order_purchases,\
                       get_order_baskets
 
 RECEIPT_DIRECTORY = '../data/receipts/'
@@ -96,6 +97,39 @@ def assign_purchase(purchase):
     return purchasers.split()
 
 
+def assign_order(order_id, conn):
+    """"""
+    purchases = get_order_purchases(order_id, conn)
+    logging.debug('Fetched {} purchases for order {}'.format(len(purchases), order_id))
+    purchases = [(pid, Purchase(description, float(price), int(quantity)))
+        for pid, description, price, quantity in purchases]
+
+    print('\nEnter flatmate identifier(s) (either a name, initial(s) or number that you keep to later.')
+    print('Seperate the identifiers by a space.\n')
+
+    flatmates = []
+    for pid, purchase in purchases:
+
+        if purchase.price == 0:
+            continue
+
+        purchasers = assign_purchase(purchase)
+        cost_each = purchase.price / len(purchasers)
+
+        for flatmate in purchasers:
+            if flatmate not in flatmates:
+                flatmates.append(flatmate)
+                logging.debug('New flatmate: {}'.format(flatmate))
+                flatmate_id = add_new_flatmate(flatmate, conn) #
+                logging.debug('Flatmate added: ID {}'.format(flatmate_id))
+            else:
+                flatmate_id = get_flatmate_id(flatmate, conn) #
+                logging.debug('Got {}\'s ID: {}'.format(flatmate, flatmate_id))
+            basket_item_id = add_new_basket_item(pid, flatmate_id, conn) #
+            logging.debug('Basket item added: ID {}'.format(basket_item_id))
+    return
+
+
 def divide_order_bill(order_id, conn):
     """Given an order_id, run a query over database and return
     a dictionary (flatmate UID: their total share of the order bill).
@@ -115,46 +149,23 @@ def main(receipt_filepath):
 
     order_info, purchases = parse_receipt(receipt_filepath)
     logging.info('Order was delivered on {}'.format(order_info['delivery date']))
-    logging.info('There were {} items purchased for a total of £{:.2f}'.format(
-        len(purchases), order_info['total']))
+    logging.info('There were {} items purchased for a total of £{:.2f}'.format(len(purchases), order_info['total']))
 
     conn = sqlite3.connect(DB_FILE) #
     logging.debug('Connected to database')
-    order_id = add_new_order(order_info, conn) #
-    logging.debug('Order added: ID {}'.format(order_id))
 
     try:
-        ## assign all purchases
-        print('\nEnter flatmate identifier(s) (either a name, initial(s) or number that you keep to later.')
-        print('Seperate the identifiers by a space.\n')
+        order_id = add_new_order(order_info, conn) #
+        logging.debug('Order added: ID {}'.format(order_id))
 
-        baskets = {}
         for index, purchase in enumerate(purchases, 1):
             purchase_id = add_new_purchase(purchase, order_id, conn) #
             logging.debug('Purchase added: ID {}'.format(purchase_id))
 
-            if purchase.price == 0:
-                continue
-
-            purchasers = assign_purchase(purchase)
-            cost_each = purchase.price / len(purchasers)
-
-            for flatmate in purchasers:
-                if flatmate not in baskets:
-                    baskets[flatmate] = [cost_each]
-                    logging.debug('New flatmate: {}'.format(flatmate))
-                    flatmate_id = add_new_flatmate(flatmate, conn) #
-                    logging.debug('Flatmate added: ID {}'.format(flatmate_id))
-                else:
-                    baskets[flatmate].append(cost_each)
-                    flatmate_id = get_flatmate_id(flatmate, conn) #
-                    logging.debug('Got {}\'s ID: {}'.format(flatmate, flatmate_id))
-                basket_item_id = add_new_basket_item(purchase_id, flatmate_id, conn) #
-                logging.debug('Basket item added: ID {}'.format(basket_item_id))
-
+        assign_order(order_id, conn) #
         print()
-        ## display how much each flatmate owes for the shop order
-        flatmate_total_share = divide_order_bill(order_id, conn)
+
+        flatmate_total_share = divide_order_bill(order_id, conn) #
         for flatmate, share_of_total_cost in flatmate_total_share.items():
             print('{} spent £{:.2f}'.format(flatmate, share_of_total_cost))
 

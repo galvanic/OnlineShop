@@ -119,6 +119,17 @@ def get_flatmate_id(name, conn):
     return flatmate_id
 
 
+def get_order_purchases(order_id, conn):
+    """
+    """
+    curs = conn.cursor()
+    curs.execute('''SELECT id, description, price, quantity
+        FROM purchase WHERE order_id = ?''', (order_id, ))
+    purchases = curs.fetchall()
+    curs.close()
+    return purchases
+
+
 def get_order_baskets(order_id, conn):
     """Returns a list of tuples [(flatmate, total), (flatmate, total)]
     """
