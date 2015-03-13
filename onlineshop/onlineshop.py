@@ -35,7 +35,10 @@ from db_helper import DB_FILE,\
                       add_new_basket_item,\
                       get_flatmate_id,\
                       get_order_purchases,\
-                      get_order_baskets
+                      get_order_baskets,\
+                      order_exists,\
+                      get_order_id,\
+                      get_count_unassigned
 
 RECEIPT_DIRECTORY = '../data/receipts/'
 
@@ -98,7 +101,10 @@ def assign_purchase(purchase):
 
 
 def assign_order(order_id, conn):
-    """"""
+    """
+    TODO: distinguish between unassigned purchases and purchases where
+          we want to modify assignment
+    """
     purchases = get_order_purchases(order_id, conn)
     logging.debug('Fetched {} purchases for order {}'.format(len(purchases), order_id))
     purchases = [(pid, Purchase(description, float(price), int(quantity)))
@@ -127,6 +133,7 @@ def assign_order(order_id, conn):
                 logging.debug('Got {}\'s ID: {}'.format(flatmate, flatmate_id))
             basket_item_id = add_new_basket_item(pid, flatmate_id, conn) #
             logging.debug('Basket item added: ID {}'.format(basket_item_id))
+    print()
     return
 
 
@@ -155,15 +162,24 @@ def main(receipt_filepath):
     logging.debug('Connected to database')
 
     try:
-        order_id = add_new_order(order_info, conn) #
-        logging.debug('Order added: ID {}'.format(order_id))
+        if order_exists(order_info['delivery date'], conn): #
+            order_id = get_order_id(order_info['delivery date'], conn) #
+            logging.info('This shop already exists in database.')
+        else:
+            order_id = add_new_order(order_info, conn) #
+            logging.debug('Order added: ID {}'.format(order_id))
 
-        for index, purchase in enumerate(purchases, 1):
-            purchase_id = add_new_purchase(purchase, order_id, conn) #
-            logging.debug('Purchase added: ID {}'.format(purchase_id))
+            for index, purchase in enumerate(purchases, 1):
+                purchase_id = add_new_purchase(purchase, order_id, conn) #
+                logging.debug('Purchase added: ID {}'.format(purchase_id))
 
-        assign_order(order_id, conn) #
-        print()
+        count_unassigned = get_count_unassigned(order_id, conn) #
+        if count_unassigned == 0:
+            logging.info('This shop\'s purchases are already assigned to flatmates')
+            pass
+        else:
+            logging.info('{} purchases are unassigned'.format(count_unassigned))
+            assign_order(order_id, conn) #
 
         flatmate_total_share = divide_order_bill(order_id, conn) #
         for flatmate, share_of_total_cost in flatmate_total_share.items():
