@@ -10,6 +10,10 @@ DB_FILE = '/Users/jc5809/Dropbox/Programming/Projects/OnlineShop/data/onlineshop
 
 def create_tables(conn):
 
+    # enable Foreign key constraints (disabled by default for backwards compatibility)
+    conn.execute('PRAGMA foreign_keys = ON')
+    conn.commit()
+
     ## Table structure for table 'flatmate'
     conn.execute('''CREATE TABLE flatmate (
         id            INTEGER PRIMARY KEY,
@@ -28,14 +32,17 @@ def create_tables(conn):
         description   CHAR(100),
         price         REAL,
         quantity      INTEGER NOT NULL,
-        order_id      INTEGER NOT NULL
+        order_id      INTEGER NOT NULL,
+        FOREIGN KEY(order_id) REFERENCES shop_order(id)
     )''')
 
     ## Table structure for table 'basket_item'
     conn.execute('''CREATE TABLE basket_item (
         id            INTEGER PRIMARY KEY,
-        purchase_id   INTEGER NOT NULL,
-        flatmate_id   INTEGER NOT NULL
+        purchase_id      INTEGER NOT NULL,
+        flatmate_id      INTEGER NOT NULL,
+        FOREIGN KEY(purchase_id) REFERENCES purchase(id),
+        FOREIGN KEY(flatmate_id) REFERENCES flatmate(id)
     )''')
 
     conn.commit()
