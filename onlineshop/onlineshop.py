@@ -55,6 +55,9 @@ def parse_receipt(receipt_filepath):
         # format is WeekdayName MonthdayNumber MonthName
         delivery_date = dt.datetime.strptime(delivery_date, '%A %d %B')
 
+        subtotal = re.search(r'Sub ?total \(estimated\)\s.(\d\d?\.\d\d)', ifile)
+        subtotal = float(subtotal.group(1))
+
         delivery_cost = re.search(r'Delivery\s.(\d\d?\.\d\d)', ifile)
         delivery_cost = float(delivery_cost.group(1))
 
@@ -68,8 +71,11 @@ def parse_receipt(receipt_filepath):
     if voucher:
         purchases.append(Purchase('Voucher savings', voucher, 1))
 
-    subtotal = sum([float(purchase.price) for purchase in purchases])
     total = subtotal + voucher + delivery_cost
+    logging.info('Subtotal: £{:.2f}'.format(subtotal))
+    logging.info('Voucher:  £{:.2f}'.format(voucher))
+    logging.info('Delivery: £{:.2f}'.format(delivery_cost))
+    logging.info('Total:    £{:.2f}'.format(total))
 
     order_info = {
         'delivery date': delivery_date,
@@ -132,9 +138,9 @@ def main(receipt_filepath):
             if purchase.price == 0:
                 continue
 
-            cost_each = purchase.price / float(purchase.quantity)
-
             purchasers = assign_purchase(purchase)
+            cost_each = purchase.price / len(purchasers)
+
             for flatmate in purchasers:
                 if flatmate not in baskets:
                     baskets[flatmate] = [cost_each]
@@ -148,9 +154,13 @@ def main(receipt_filepath):
                 basket_item_id = add_new_basket_item(purchase_id, flatmate_id, conn) #
                 logging.debug('Basket item added: ID {}'.format(basket_item_id))
 
+        print()
         ## display how much each flatmate owes for the shop order
-        for flatmate, owes in divide_order_bill(baskets).items():
-            print('{} spent £{:.2f}'.format(flatmate, owes))
+        flatmate_total_share = divide_order_bill(baskets)
+        for flatmate, share_of_total_cost in flatmate_total_share.items():
+            print('{} spent £{:.2f}'.format(flatmate, share_of_total_cost))
+
+        logging.info('For a total of £{:.2f}'.format(sum(flatmate_total_share.values())))
 
     except KeyboardInterrupt:
         pass

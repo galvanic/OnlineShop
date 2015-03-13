@@ -15,10 +15,10 @@ Delivery address	London.
 Delivery time	7:30pm - 8:30pm
 Delivery date	Tuesday 29 March
 Order reference	3413262367
-Sub total (estimated)	£19.48
-Picking, Packing and Delivery	£1.06
+Sub total (estimated)	£7.82
+Picking, Packing and Delivery	£1.99
 Voucher Saving	£0.00
-Total (estimated)	£19.48
+Total (estimated)	£9.81
 The total cost is estimated because some of the items you might have ordered, such as meat and cheese, are sold by weight. The exact cost will be shown on your receipt when your order is delivered. This cost includes the delivery charge if any.
 You can also view your order and its status online.
 
@@ -29,9 +29,10 @@ We believe we were the first UK grocery retailer to invest in closed-loop grocer
 Products you've ordered
 Cupboard
 
-1 Milk £8.50
-1 Chocolate £4.99
-1 Bananas £5.99
+1 Full Cream Milk 2 Pints essential Waitrose £0.89
+1 Ocado Fairtrade Ripen at Home Bananas £1.40
+2 Lindt Excellence 70% Cocoa Dark Chocolate £3.78
+1 Courgettes Waitrose £1.75
 Changing your order
 
 If you want to change any items on your order or change the delivery, simply go to www.ocado.com and the Orders page; from here, click on the order reference number and make the appropriate changes.
