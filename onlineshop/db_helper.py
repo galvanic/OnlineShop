@@ -43,8 +43,7 @@ def create_tables(conn):
 
 
 def add_new_order(order_info, conn):
-    """
-    Creates a new shop order with order info (date, etc.),
+    """Creates a new shop order with order info (date, etc.),
     only if order doesn't exist yet.
     """
     curs = conn.cursor()
@@ -91,8 +90,7 @@ def add_new_flatmate(name, conn):
 
 
 def add_new_basket_item(purchase_id, flatmate_id, conn):
-    """
-    I.e. assigning a purchase to (a) flatmate(s).
+    """I.e. assigning a purchase to (a) flatmate(s).
     """
     curs = conn.cursor()
     curs.execute('INSERT INTO basket_item (purchase_id, flatmate_id) VALUES (?,?)',

@@ -41,8 +41,7 @@ Purchase = namedtuple('Purchase', 'description, price, quantity')
 
 
 def parse_receipt(receipt_filepath):
-    """
-    Finds all the ordered items (=purchases) in the receipt text (eg. the
+    """Finds all the ordered items (=purchases) in the receipt text (eg. the
     confirmation email for Ocado orders) using regular expressions.
     Returns a list of Purchases.
     """
@@ -86,8 +85,7 @@ def parse_receipt(receipt_filepath):
 
 
 def assign_purchase(purchase):
-    """
-    Given an item, prints the quantity and description of the purchase, waits
+    """Given an item, prints the quantity and description of the purchase, waits
     for user input and returns a list of purchasers' UIDs.
     User input is expected to be anything that would uniquely identify a
     flatmate (from the other flatmates). Multiple flatmates can be entered
@@ -97,11 +95,9 @@ def assign_purchase(purchase):
     return purchasers.split()
 
 
-def divide_order_bill(baskets):
-    """
-    Given a dictionary (flatmate UID: their cost share of each of
-    their purchases), return a dictionary (flatmate UID: their total
-    share of the order bill).
+def divide_order_bill(order_id, conn):
+    """Given an order_id, run a query over database and return
+    a dictionary (flatmate UID: their total share of the order bill).
 
     TODO: need better name for this function
     """
