@@ -112,6 +112,19 @@ def get_flatmate_id(name, conn):
     return flatmate_id
 
 
+def get_order_baskets(order_id, conn):
+    """Returns a list of tuples [(flatmate, total), (flatmate, total)]
+    """
+    with open('onlineshop/get_baskets.sql', 'r') as ifile:
+        query = ifile.read()
+
+    curs = conn.cursor()
+    curs.execute(query, (order_id, ))
+    baskets = curs.fetchall()
+    curs.close()
+    return baskets
+
+
 if __name__ == '__main__':
     conn = sqlite3.connect(DB_FILE)
     create_tables(conn)

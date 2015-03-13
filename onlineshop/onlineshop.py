@@ -33,7 +33,8 @@ from db_helper import DB_FILE,\
                       add_new_purchases,\
                       add_new_flatmate,\
                       add_new_basket_item,\
-                      get_flatmate_id
+                      get_flatmate_id,\
+                      get_order_baskets
 
 RECEIPT_DIRECTORY = '../data/receipts/'
 
@@ -101,8 +102,9 @@ def divide_order_bill(order_id, conn):
 
     TODO: need better name for this function
     """
-    baskets = {flatmate:sum(purchases) for flatmate, purchases in baskets.items()}
-    return baskets
+    flatmate_totals = get_order_baskets(order_id, conn)
+    flatmate_totals = {flatmate:total for flatmate, total in flatmate_totals}
+    return flatmate_totals
 
 
 def main(receipt_filepath):
@@ -152,7 +154,7 @@ def main(receipt_filepath):
 
         print()
         ## display how much each flatmate owes for the shop order
-        flatmate_total_share = divide_order_bill(baskets)
+        flatmate_total_share = divide_order_bill(order_id, conn)
         for flatmate, share_of_total_cost in flatmate_total_share.items():
             print('{} spent £{:.2f}'.format(flatmate, share_of_total_cost))
 
