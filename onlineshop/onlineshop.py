@@ -96,7 +96,7 @@ def assign_purchase(purchase):
     flatmate (from the other flatmates). Multiple flatmates can be entered
     by seperating their UID by a space.
     """
-    purchasers = ask('Who bought   {0.quantity} {0.description}   {1:<10}'.format(purchase, '?'), None, '')
+    purchasers = ask('Who bought {:50}'.format('{0.quantity} {0.description} ?'.format(purchase)), None, '')
     return purchasers.split()
 
 
