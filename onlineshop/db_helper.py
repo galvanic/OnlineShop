@@ -195,6 +195,27 @@ def get_count_unassigned(order_id, conn):
     return count_unassigned
 
 
+def get_orders(conn):
+    """Returns a list of tuples of order information
+    """
+    curs = conn.cursor()
+    curs.execute('SELECT id, delivery_date FROM shop_order')
+    orders = curs.fetchall()
+    curs.close()
+    return orders
+
+
+def get_flatmate_names(conn):
+    """Returns a list of flatmate names.
+    """
+    curs = conn.cursor()
+    curs.execute('SELECT name FROM flatmate')
+    flatmates = curs.fetchall()
+    flatmates = [f[0] for f in flatmates]
+    curs.close()
+    return flatmates
+
+
 if __name__ == '__main__':
     conn = sqlite3.connect(DB_FILE)
     create_tables(conn)

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}index{% endblock %}
+{% block content %}
+
+<div id='flatmates'>
+  {% if flatmates %}
+    <ol>
+    {% for flatmate in flatmates %}
+      <li>{{ flatmate }}</li>
+    {% endfor %}
+    </ol>
+  {% endif %}
+  <a href="{{ url_for('add_flatmates') }}">Add new flatmate(s)</a>
+</div>
+
+<div>
+  {% if orders %}
+    <ol>
+    {% for shop_order in orders %}
+      <li>
+        <a href="{{ url_for('display_order', order_id = shop_order.id) }}">
+        {{ shop_order.delivery_date }}
+        </a>
+      </li>
+    {% endfor %}
+    </ol>
+  {% endif %}
+  <a href="{{ url_for('paste_receipt') }}">Add a new order</a>
+</div>
+
+
+{% endblock %}
