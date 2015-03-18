@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Assign order {{ order_id }}{% endblock %}
+{% block content %}
+
+<div id='purchases'>
+<form action='{{ url_for("add_basket_items", order_id=order_id) }}' method='post' enctype='multipart/form-data' id='assign_purchases'>
+
+  <table>
+  {% for purchase in purchases %}
+    <tr>
+      <td>{{ purchase['quantity'] }}</td>
+      <td>{{ purchase['description'] }}</td>
+      <td>{{ purchase['price'] }}</td>
+      <td>
+        <ul>
+        {% for name in flatmates|sort %}
+          <li>
+            <input type='checkbox' name='{{ purchase["id"] }}' value='{{ name }}' id='{{ purchase["id"] }} {{ name }}' />
+            <label for='{{ purchase["id"] }} {{ name }}'>{{ name|title }}</label>
+          </li>
+        {% endfor %}
+        </ul>
+      </td>
+    </tr>
+  {% endfor %}
+  </table>
+
+  <input type='submit' id='submit_button' name='submit' value='Split my bill' />
+</form>
+</div>
+
+
+{% endblock %}

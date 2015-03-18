@@ -9,11 +9,7 @@
 <body>
 
   <header>
-    <ul>
-      {% if request.path != url_for('index') and request.path != '/' %}
-      <li><a href="{{ url_for('index') }}">Map Making</a></li>
-      {% endif %}
-    </ul>
+  	<a href='{{ url_for("index") }}'>Homepage</a>
   </header>
 
   <div id="content">{% block content %}{% endblock %}</div>

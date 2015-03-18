@@ -4,26 +4,31 @@
 
 <div id='flatmates'>
   {% if flatmates %}
-    <ol>
+    <ul>
     {% for flatmate in flatmates %}
       <li>{{ flatmate }}</li>
     {% endfor %}
-    </ol>
+    </ul>
   {% endif %}
-  <a href="{{ url_for('add_flatmates') }}">Add new flatmate(s)</a>
+  <a href="{{ url_for('new_flatmates') }}">Add new flatmate(s)</a>
 </div>
 
-<div>
+<div id='order'>
   {% if orders %}
-    <ol>
+    <table>
     {% for shop_order in orders %}
-      <li>
-        <a href="{{ url_for('display_order', order_id = shop_order.id) }}">
-        {{ shop_order.delivery_date }}
-        </a>
-      </li>
+      <tr>
+        <td>
+          <a href="{{ url_for('display_order', order_id = shop_order['id']) }}">
+          {{ shop_order['delivery_date'] }}
+          </a>
+        </td>
+        <td>
+          {{ shop_order['total'] }}
+        </td>
+      </tr>
     {% endfor %}
-    </ol>
+    </table>
   {% endif %}
   <a href="{{ url_for('paste_receipt') }}">Add a new order</a>
 </div>

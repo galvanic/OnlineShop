@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Add flatmates{% endblock %}
+{% block content %}
+
+
+<h1>Add flatmate(s)</h1>
+
+<p>Existing flatmates:</p>
+<ul>
+{% for name in flatmates %}
+  <li>{{ name }}</li>
+{% endfor %}
+</ul>
+
+<p>Enter the names of the flatmates you want to add seperated by a space.</p>
+
+<form action='{{ url_for("add_flatmates") }}' method='post' enctype='multipart/form-data' id='flatmates_form'>
+  <input type='text' name='flatmates' />
+  <input type='submit' id='add_flatmates' name='submit_button' value='Add flatmate(s)'>
+</form>
+
+
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Order {{ order['id'] }}{% endblock %}
+{% block content %}
+
+<div id='baskets'>
+  {% if baskets %}
+  <table>
+  {% for flatmate, contribution in baskets.items %}
+    <tr>
+      <td>{{ flatmate }}</td>
+      <td>{{ contribution }}</td>
+    </tr>
+  {% endfor %}
+  </table>
+  {% endif %}
+  <a href="{{ url_for('assign_order', order_id=order['id']) }}">Re-assign this order</a>
+</div>
+
+<div id='purchases'>
+  <table>
+  {% for purchase, assigned_to in purchases %}
+    <tr>
+      <td>{{ purchase['quantity'] }}</td>
+      <td>{{ purchase['description'] }}</td>
+      <td>{{ purchase['price'] }}</td>
+      <td>
+        <ul>
+        {% for flatmate in assigned_to|sort %}
+          <li>{{ flatmate }}</li>
+        {% endfor %}
+        </ul>
+      </td>
+    </tr>
+  {% endfor %}
+  </table>
+</div>
+
+
+{% endblock %}
