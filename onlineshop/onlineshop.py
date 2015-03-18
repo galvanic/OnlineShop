@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 
 """
@@ -20,73 +19,90 @@ what each 'thing' represents.
 
 import re
 import sys
-import click
 import datetime as dt
-from collections import namedtuple
-import sqlite3
-import logging
 
-from .helper import ask, get_latest_file
-from .db_helper import DB_FILE,\
-                        add_new_order,\
-                        add_new_purchase,\
-                        add_new_purchases,\
-                        add_new_flatmate,\
-                        add_new_basket_item,\
-                        get_flatmate_id,\
-                        get_order_purchases,\
-                        get_order_baskets,\
-                        order_exists,\
-                        get_order_id,\
-                        get_count_unassigned
-
-RECEIPT_DIRECTORY = '../data/receipts/'
-
-Purchase = namedtuple('Purchase', 'description, price, quantity')
+from .api import does_order_exist,\
+                    get_order_id,\
+                    add_new_order,\
+                    add_new_purchase,\
+                    is_order_assigned,\
+                    get_order_purchases,\
+                    get_flatmate_names,\
+                    add_new_flatmate,\
+                    get_flatmate_id,\
+                    add_new_basket_item,\
+                    get_order_baskets
 
 
-def parse_receipt(receipt_filepath):
+def parse_receipt(receipt_text):
     """Finds all the ordered items (=purchases) in the receipt text (eg. the
     confirmation email for Ocado orders) using regular expressions.
-    Returns a list of Purchases.
+    Returns a tuple (dict of order information,
+                    list of tuples (description, quantity, price)).
     """
-    with open(receipt_filepath, 'rU') as f:
-        ifile = f.read()
-        purchases = re.findall(r'(^\d\d?) (.+?) £(\d\d?\.\d\d)', ifile, re.MULTILINE)
+    purchases = re.findall(r'(^\d\d?) (.+?) £(\d\d?\.\d\d)', receipt_text, re.MULTILINE)
 
-        delivery_date = re.search(r'Delivery date\s([\w\d ]+)', ifile)
-        delivery_date = delivery_date.group(1)
-        # format is WeekdayName MonthdayNumber MonthName
-        delivery_date = dt.datetime.strptime(delivery_date, '%A %d %B')
+    delivery_date = re.search(r'Delivery date\s([\w\d ]+)', receipt_text)
+    delivery_date = delivery_date.group(1)
+    # format is WeekdayName MonthdayNumber MonthName
+    delivery_date = dt.datetime.strptime(delivery_date, '%A %d %B')
 
-        subtotal = re.search(r'Sub ?total \(estimated\)\s.(\d\d?\.\d\d)', ifile)
-        subtotal = float(subtotal.group(1))
+    subtotal = re.search(r'Sub ?total \(estimated\)\s.(\d\d?\.\d\d)', receipt_text)
+    subtotal = float(subtotal.group(1))
 
-        delivery_cost = re.search(r'Delivery\s.(\d\d?\.\d\d)', ifile)
-        delivery_cost = float(delivery_cost.group(1))
+    delivery_cost = re.search(r'Delivery\s.(\d\d?\.\d\d)', receipt_text)
+    delivery_cost = float(delivery_cost.group(1))
 
-        voucher = re.search(r'Voucher Saving\s.(-?\d\d?.\d\d)', ifile)
-        voucher = float(voucher.group(1))
+    voucher = re.search(r'Voucher Saving\s.(-?\d\d?.\d\d)', receipt_text)
+    voucher = float(voucher.group(1))
 
-    purchases = [Purchase(description, float(price), int(quantity))
-        for quantity, description, price in purchases]
+    purchases = [
+        {
+            'description': description,
+            'quantity':    int(quantity),
+            'price':       float(price)
+        }
 
-    purchases.append(Purchase('Delivery costs', delivery_cost, 1))
+        for quantity, description, price in purchases
+    ]
+
+    purchases.append({
+        'description': 'Delivery costs',
+        'quantity':    1,
+        'price':       delivery_cost
+    })
+
     if voucher:
-        purchases.append(Purchase('Voucher savings', voucher, 1))
+        purchases.append({
+            'description': 'Voucher savings',
+            'quantity':    1,
+            'price':       voucher
+        })
 
     total = subtotal + voucher + delivery_cost
-    logging.info('Subtotal: £{:.2f}'.format(subtotal))
-    logging.info('Voucher:  £{:.2f}'.format(voucher))
-    logging.info('Delivery: £{:.2f}'.format(delivery_cost))
-    logging.info('Total:    £{:.2f}'.format(total))
 
     order_info = {
-        'delivery date': delivery_date,
-        'total': total,
+        'delivery_date': delivery_date,
+        'total': total
     }
 
     return order_info, purchases
+
+
+def process_input_order(receipt_text):
+    """"""
+    order_info, purchases = parse_receipt(receipt_text)
+
+    order_exists = does_order_exist(order_info)
+    if order_exists:
+        order_id = get_order_id(order_info)
+    else:
+        order_id = add_new_order(order_info)
+
+        for purchase in purchases:
+            add_new_purchase(purchase, order_id)
+
+    return order_id
 
 
 def assign_purchase(purchase):
@@ -96,125 +112,65 @@ def assign_purchase(purchase):
     flatmate (from the other flatmates). Multiple flatmates can be entered
     by seperating their UID by a space.
     """
-    purchasers = ask('Who bought {:50}'.format('{0.quantity} {0.description} ?'.format(purchase)), None, '')
+    purchasers = input('Who bought {:50}'.format('{quantity} {description} ?'.format(**purchase)))
     return purchasers.split()
 
 
-def assign_order(order_id, conn):
+def assign_order(purchases):
     """
     TODO: distinguish between unassigned purchases and purchases where
           we want to modify assignment
     """
-    purchases = get_order_purchases(order_id, conn)
-    logging.debug('Fetched {} purchases for order {}'.format(len(purchases), order_id))
-    purchases = [(pid, Purchase(description, float(price), int(quantity)))
-        for pid, description, price, quantity in purchases]
-
     print('\nEnter flatmate identifier(s) (either a name, initial(s) or number that you keep to later.')
     print('Seperate the identifiers by a space.\n')
 
-    flatmates = []
-    for pid, purchase in purchases:
+    flatmates = get_flatmate_names()
+    for purchase in purchases:
 
-        if purchase.price == 0:
+        if purchase['price'] == 0.00:
             continue
 
         purchasers = assign_purchase(purchase)
-        cost_each = purchase.price / len(purchasers)
+        cost_each = purchase['price'] / len(purchasers)
 
         for flatmate in purchasers:
             if flatmate not in flatmates:
                 flatmates.append(flatmate)
-                logging.debug('New flatmate: {}'.format(flatmate))
-                flatmate_id = add_new_flatmate(flatmate, conn) #
-                logging.debug('Flatmate added: ID {}'.format(flatmate_id))
+                flatmate_id = add_new_flatmate(flatmate)
             else:
-                flatmate_id = get_flatmate_id(flatmate, conn) #
-                logging.debug('Got {}\'s ID: {}'.format(flatmate, flatmate_id))
-            basket_item_id = add_new_basket_item(pid, flatmate_id, conn) #
-            logging.debug('Basket item added: ID {}'.format(basket_item_id))
+                flatmate_id = get_flatmate_id(flatmate)
+            basket_item_id = add_new_basket_item(purchase['id'], flatmate_id)
     print()
     return
 
 
-def divide_order_bill(order_id, conn):
+def calculate_bill_contributions(order_id):
     """Given an order_id, run a query over database and return
     a dictionary (flatmate UID: their total share of the order bill).
 
     TODO: need better name for this function
     """
-    flatmate_totals = get_order_baskets(order_id, conn)
-    flatmate_totals = {flatmate:total for flatmate, total in flatmate_totals}
-    return flatmate_totals
+    flatmate_contributions = get_order_baskets(order_id)
+    return flatmate_contributions
 
 
-def main(receipt_filepath):
+def main(receipt_file):
     """"""
-    if not receipt_filepath:
-        receipt_filepath = get_latest_file(RECEIPT_DIRECTORY)
-        logging.info('No receipt given, got latest: {}'.format(receipt_filepath))
+    with receipt_file as f:
+        receipt_text = f.read()
 
-    order_info, purchases = parse_receipt(receipt_filepath)
-    logging.info('Order was delivered on {}'.format(order_info['delivery date']))
-    logging.info('There were {} items purchased for a total of £{:.2f}'.format(len(purchases), order_info['total']))
+    order_id = process_input_order(receipt_text)
 
-    conn = sqlite3.connect(DB_FILE) #
-    logging.debug('Connected to database')
-
-    try:
-        if order_exists(order_info['delivery date'], conn): #
-            order_id = get_order_id(order_info['delivery date'], conn) #
-            logging.info('This shop already exists in database.')
-        else:
-            order_id = add_new_order(order_info, conn) #
-            logging.debug('Order added: ID {}'.format(order_id))
-
-            for index, purchase in enumerate(purchases, 1):
-                purchase_id = add_new_purchase(purchase, order_id, conn) #
-                logging.debug('Purchase added: ID {}'.format(purchase_id))
-
-        count_unassigned = get_count_unassigned(order_id, conn) #
-        if count_unassigned == 0:
-            logging.info('This shop\'s purchases are already assigned to flatmates')
-            pass
-        else:
-            logging.info('{} purchases are unassigned'.format(count_unassigned))
-            assign_order(order_id, conn) #
-
-        flatmate_total_share = divide_order_bill(order_id, conn) #
-        for flatmate, share_of_total_cost in flatmate_total_share.items():
-            print('{} spent £{:.2f}'.format(flatmate, share_of_total_cost))
-
-        logging.info('For a total of £{:.2f}'.format(sum(flatmate_total_share.values())))
-
-    except KeyboardInterrupt:
+    assigned = is_order_assigned(order_id)
+    if assigned:
         pass
+    else:
+        purchases = get_order_purchases(order_id)
+        assign_order(purchases)
 
-    finally:
-        conn.close() #
-        logging.debug('Closed db connection.')
+    ## calculate individual contributions to bill
+    flatmate_contributions = calculate_bill_contributions(order_id)
+    for flatmate, flatmate_contribution in flatmate_contributions.items():
+        print('{} spent £{:.2f}'.format(flatmate, flatmate_contribution))
 
     return
-
-
-@click.command()
-@click.option('receipt_filepath', '-i', '--receipt',    default=None,
-                                                        type=click.Path(exists=True),
-                                                        help='Input filepath.')
-@click.option('debug', '--debug', is_flag=True)
-@click.option('info',  '--info',  is_flag=True)
-def cli(debug, info, *args, **kwargs):
-
-    if debug:
-        log_level = logging.DEBUG
-    elif info:
-        log_level = logging.INFO
-    else:
-        log_level = logging.WARN
-    logging.basicConfig(level=log_level)
-
-    return main(*args, **kwargs)
-
-
-if __name__ == '__main__':
-    sys.exit(cli())
