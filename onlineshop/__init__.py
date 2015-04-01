@@ -1,7 +1,8 @@
 # for use for any app that imports the onlineshop package
 from .onlineshop import process_input_order,\
                         calculate_bill_contributions,\
-                        main
+                        parse_receipt,\
+                        process_input_order
 
 from .api import does_order_exist,\
                   get_order_id,\
