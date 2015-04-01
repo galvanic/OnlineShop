@@ -41,4 +41,7 @@ You can interact with the program through:
 
 Future Improvements
 -------------------
+- Yahoo Mail API to fetch shop receipt email automatically
+- Makes guesses on whose item it is based on previous shop assignments
+
 See TODOs ...
