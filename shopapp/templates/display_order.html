@@ -2,21 +2,28 @@
 {% block title %}Order {{ order['id'] }}{% endblock %}
 {% block content %}
 
+<h1>Order {{ order['id'] }}</h1>
+<h5>Made on {{ order['delivery_date'] }}</h5>
+
 <div id='baskets'>
   {% if baskets %}
-  <table>
-  {% for flatmate, contribution in baskets.items %}
-    <tr>
-      <td>{{ flatmate }}</td>
-      <td>{{ contribution }}</td>
-    </tr>
-  {% endfor %}
-  </table>
+    <h2>Each flatmate owes:</h2>
+    <table>
+    {% for flatmate, contribution in baskets.items %}
+      <tr>
+        <td>{{ flatmate }}</td>
+        <td>{{ contribution }}</td>
+      </tr>
+    {% endfor %}
+    </table>
+    <a href="{{ url_for('assign_order', order_id=order['id']) }}">Re-assign this order</a>
+  {% else %}
+    <a href="{{ url_for('assign_order', order_id=order['id']) }}">Assign this order</a>
   {% endif %}
-  <a href="{{ url_for('assign_order', order_id=order['id']) }}">Re-assign this order</a>
 </div>
 
 <div id='purchases'>
+  <h2>Purchases</h2>
   <table>
   {% for purchase, assigned_to in purchases %}
     <tr>

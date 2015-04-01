@@ -4,6 +4,7 @@
 
 <div id='flatmates'>
   {% if flatmates %}
+  <h2>Flatmates</h2>
     <ul>
     {% for flatmate in flatmates %}
       <li>{{ flatmate }}</li>
@@ -15,6 +16,7 @@
 
 <div id='order'>
   {% if orders %}
+  <h2>Orders</h2>
     <table>
     {% for shop_order in orders %}
       <tr>
