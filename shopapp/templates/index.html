@@ -11,7 +11,7 @@
     {% endfor %}
     </ul>
   {% endif %}
-  <a href="{{ url_for('new_flatmates') }}">Add new flatmate(s)</a>
+  <a href="{{ url_for('new_flatmates') }}" class='action'>Add new flatmate(s)</a>
 </div>
 
 <div id='deliveries' class='deliveries delivery'>
@@ -20,17 +20,13 @@
     <table>
     {% for delivery in deliverys %}
       <tr>
-        <td>
-          <a href="{{ url_for('display_delivery', delivery_id=delivery.id) }}">
-          {{ delivery.date.strftime('%A %-d %b') }}
-          </a>
-        </td>
+        <td><a href="{{ url_for('display_delivery', delivery_id=delivery.id) }}">{{ delivery.date.strftime('%A %-d %b') }}</a></td>
         <td>£ {{ delivery.total }}</td>
       </tr>
     {% endfor %}
     </table>
   {% endif %}
-  <a href="{{ url_for('paste_receipt') }}">Add a new delivery</a>
+  <a href="{{ url_for('paste_receipt') }}" class='action'>Add a new delivery</a>
 </div>
 
 

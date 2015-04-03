@@ -6,11 +6,7 @@
 <h5>Made on {{ delivery.date.strftime('%A %-d %b') }}</h5>
 
 <div class='assign'>
-  {% if baskets %}
-    <a href="{{ url_for('assign_delivery', delivery_id=delivery.id) }}" class='assign'>Re-assign this delivery</a>
-  {% else %}
-    <a href="{{ url_for('assign_delivery', delivery_id=delivery.id) }}" class='assign'>Assign this delivery</a>
-  {% endif %}
+  <a href="{{ url_for('assign_delivery', delivery_id=delivery.id) }}" class='assign action'>{% if baskets %}Re-a{% else %}A{% endif %}ssign this delivery</a>
 </div>
 
 {% if baskets %}
