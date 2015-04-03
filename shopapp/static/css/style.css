@@ -1,0 +1,190 @@
+body {
+    width: 700px;
+    margin: auto;
+    background-color: #F8F0DB;
+    font-size: 1.1em;
+}
+
+body, input {
+    font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+}
+
+div#content {
+    position: relative;
+}
+
+div#content > div, header {
+    margin: 40px 0;
+}
+
+form {
+    margin: 30px 0;
+}
+
+div#content > div > a {
+    text-decoration: none;
+    padding: 5px 12px;
+    color: white;
+}
+
+.flatmate > a, input[type=submit].flatmate {
+    background-color: #FB6470;
+}
+
+.flatmate > a:hover, input[type=submit].flatmate:hover {
+    background-color: #fdb9be;
+}
+
+.delivery > a, input[type=submit].delivery {
+    background-color: #4BA676;
+}
+
+.delivery > a:hover, input[type=submit].delivery:hover {
+    background-color: #6fbe94;
+}
+
+.assign > a, input[type=submit].assign {
+    background-color: #617BA6;
+}
+
+.assign > a:hover, input[type=submit].assign:hover {
+    background-color: #8b9ebd;
+}
+
+.flatmate > a:focus, input[type=submit].flatmate:focus,
+.delivery > a:focus, input[type=submit].delivery:focus,
+.assign > a:focus, input[type=submit].assign:focus, {
+    position: relative;
+    top: 2px;
+    left: 1px;
+}
+
+div.assign {
+    position: absolute;
+    right: 0px;
+    top: -25px;
+}
+
+header a {
+    font-weight: bold;
+    color: #522619;
+}
+
+p {
+    font-size: 0.9em;
+}
+
+h1, h2 {
+    font-weight: normal;
+}
+
+h1 {
+    border-bottom: solid 1px #D1AA8B;
+    padding-bottom: 10px;
+}
+
+h2 {
+    margin-bottom: 0px;
+}
+
+ul, ol, table {
+    margin: 20px;
+    margin-top: 10px;
+    padding-left: 0;
+    border-left: solid 2px #D1AA8B;
+    list-style-type: none;
+}
+
+li {
+    padding: 2px;
+    padding-left: 20px;
+}
+
+table a {
+    color: black;
+    text-decoration: none;
+}
+
+textarea {
+    width: 658px;
+    height: 300px;
+    padding: 20px;
+    border: white solid 1px;
+}
+
+input[type=submit] {
+    display: block;
+    padding: 5px 10px;
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: 0px;
+    border: none;
+    font-size: 1em;
+    color: white;
+}
+
+input[type=text] {
+    font-size: 1.5em;
+    padding: 5px;
+    width: 200px;
+    background-color: #F8F0DB;
+    border: none;
+    border-bottom: dashed 2px #D1AA8B;
+    color: #856C58;
+    margin: 0px 0px;
+}
+
+input[type=text]:focus, input[type=submit]:focus, textarea:focus {
+    outline: none;
+}
+
+input[type=checkbox] + label {
+    display: inline-block;
+    padding: 0 6px;
+    background-color: #FB6470;
+}
+
+input[type=checkbox] + label:hover {
+    background-color: #fdb9be;
+}
+
+input[type=checkbox]:checked + label {
+    background-color: #f80e21;
+}
+
+input[type=checkbox]:checked + label:hover {
+    background-color: #FB6470;
+}
+
+input[type=checkbox] {
+    display: none;
+}
+
+table {
+    width: 660px;
+    border-collapse: collapse;
+}
+
+table td:last-child {
+    padding-right: 0;
+}
+
+table.assign td:nth-child(2) {
+    padding-right: 30px;
+}
+
+table td {
+    padding: 2px 20px;
+}
+
+table tr:hover td, li:hover {
+    background-color: #fefeff;
+}
+
+table.assign tr:hover td:last-child {
+    background-color: #F8F0DB;
+}
+
+tr.total {
+    background-color: #e4c779;
+}
