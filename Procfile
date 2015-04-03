@@ -1,1 +1,1 @@
-web: python3.3 runserver.py
+web: gunicorn runserver:app --log-file -

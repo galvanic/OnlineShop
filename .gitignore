@@ -1,7 +1,6 @@
 *.pyc
-data/
+data/receipts/
 access.txt
 consumer.txt
 *.csv
-*.db
 .todo*
