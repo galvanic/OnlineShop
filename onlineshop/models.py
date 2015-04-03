@@ -33,7 +33,7 @@ class Delivery(Base):
         return self.date.strftime('%A %-d %b')
 
     def __repr__(self):
-        return 'Delivery #{} delivered on {}'.format(self.id, str(self.delivery_date))
+        return 'Delivery #{} delivered on {}'.format(self.id, str(self.date))
 
 
 class Purchase(Base):
