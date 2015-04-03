@@ -37,6 +37,7 @@ def parse_receipt(receipt_text):
     delivery_date = delivery_date.group(1)
     # format is WeekdayName MonthdayNumber MonthName
     delivery_date = dt.datetime.strptime(delivery_date, '%A %d %B')
+    delivery_date = delivery_date.date()
 
     subtotal = re.search(r'Sub ?total \(estimated\)\s.(\d\d?\.\d\d)', receipt_text)
     subtotal = float(subtotal.group(1))
@@ -100,11 +101,11 @@ def process_input_delivery(receipt_text):
         pass
 
     else:
-        delivery = Delivery(
+        new_delivery = Delivery(
             date = delivery_info['date'],
             total = delivery_info['total']
         )
-        session.add(delivery)
+        session.add(new_delivery)
         session.commit()
 
         purchases = [
@@ -112,10 +113,12 @@ def process_input_delivery(receipt_text):
                 description = p['description'],
                 quantity = p['quantity'],
                 price = p['price'],
-                delivery_id = delivery.id
+                delivery_id = new_delivery.id
             )   for p in purchases
         ]
         session.add_all(purchases)
         session.commit()
+
+        delivery = new_delivery
 
     return delivery.id
