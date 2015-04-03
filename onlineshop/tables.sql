@@ -6,7 +6,7 @@ create table flatmate (
     name          char(100) not null unique
 )
 
-create table shop_order (
+create table delivery (
     id            integer primary key,
     delivery_date text not null unique,
     total         real not null

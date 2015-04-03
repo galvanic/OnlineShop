@@ -2,37 +2,35 @@
 {% block title %}index{% endblock %}
 {% block content %}
 
-<div id='flatmates'>
+<div id='flatmates' class='flatmates flatmate'>
   {% if flatmates %}
   <h2>Flatmates</h2>
     <ul>
     {% for flatmate in flatmates %}
-      <li>{{ flatmate }}</li>
+      <li>{{ flatmate.name|title }}</li>
     {% endfor %}
     </ul>
   {% endif %}
   <a href="{{ url_for('new_flatmates') }}">Add new flatmate(s)</a>
 </div>
 
-<div id='order'>
-  {% if orders %}
-  <h2>Orders</h2>
+<div id='deliveries' class='deliveries delivery'>
+  {% if deliverys %}
+  <h2>Deliveries</h2>
     <table>
-    {% for shop_order in orders %}
+    {% for delivery in deliverys %}
       <tr>
         <td>
-          <a href="{{ url_for('display_order', order_id = shop_order['id']) }}">
-          {{ shop_order['delivery_date'] }}
+          <a href="{{ url_for('display_delivery', delivery_id=delivery.id) }}">
+          {{ delivery.date.strftime('%A %-d %b') }}
           </a>
         </td>
-        <td>
-          {{ shop_order['total'] }}
-        </td>
+        <td>£ {{ delivery.total }}</td>
       </tr>
     {% endfor %}
     </table>
   {% endif %}
-  <a href="{{ url_for('paste_receipt') }}">Add a new order</a>
+  <a href="{{ url_for('paste_receipt') }}">Add a new delivery</a>
 </div>
 
 

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}delivery {{ delivery.id }}{% endblock %}
+{% block content %}
+
+<h1>Delivery {{ delivery.id }}</h1>
+<h5>Made on {{ delivery.date.strftime('%A %-d %b') }}</h5>
+
+<div class='assign'>
+  {% if baskets %}
+    <a href="{{ url_for('assign_delivery', delivery_id=delivery.id) }}" class='assign'>Re-assign this delivery</a>
+  {% else %}
+    <a href="{{ url_for('assign_delivery', delivery_id=delivery.id) }}" class='assign'>Assign this delivery</a>
+  {% endif %}
+</div>
+
+{% if baskets %}
+  <div class='basket'>
+    <h2>Each flatmate owes:</h2>
+    <table>
+      {% for name, contribution in baskets %}
+      <tr>
+        <td>{{ name|title }}</td>
+        <td>£ {{ contribution }}</td>
+      </tr>
+      {% endfor %}
+      <tr class='total'>
+        <td>Total</td>
+        <td>£ {{ delivery.total }}</td>
+      </tr>
+    </table>
+  </div>
+{% endif %}
+
+<div class='purchase'>
+  <h2>Purchases</h2>
+  <table>
+    {% for purchase, assigned_to in purchases %}
+    <tr>
+      <td>{{ purchase.quantity }}</td>
+      <td>{{ purchase.description }}</td>
+      <td>£ {{ purchase.price }}</td>
+      {% if assigned_to %}
+      <td>
+        {% for flatmate in assigned_to %}
+          {{ flatmate.name[0]|title }}
+        {% endfor %}
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+    <tr class='total'>
+      <td></td>
+      <td>Total</td>
+      <td>£ {{ delivery.total }}</td>
+      <td></td>
+    </tr>
+  </table>
+</div>
+
+
+{% endblock %}

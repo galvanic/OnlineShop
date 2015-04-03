@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Assign delivery {{ delivery_id }}{% endblock %}
+{% block content %}
+
+<h1>Assign delivery {{ delivery_id }}</h1>
+
+<form action='{{ url_for("add_basket_items", delivery_id=delivery_id) }}' method='post' enctype='multipart/form-data' id='assign_purchases'>
+
+  <table class='assign'>
+  {% for purchase in purchases %}
+    <tr>
+      <td>{{ purchase.quantity }}</td>
+      <td>{{ purchase.description }}</td>
+      <td>£ {{ purchase.price }}</td>
+      <td>
+        {% for flatmate in flatmates %}
+          <input type='checkbox' name='{{ purchase.id }}' value='{{ flatmate.name }}' id='{{ purchase.id }} {{ flatmate.name }}' />
+          <label for='{{ purchase.id }} {{ flatmate.name }}'>{{ flatmate.name[0]|title }}</label>
+        {% endfor %}
+      </td>
+    </tr>
+  {% endfor %}
+  </table>
+
+  <input type='submit' id='submit_button' name='submit' value='Split my bill' class='assign' />
+</form>
+
+
+{% endblock %}

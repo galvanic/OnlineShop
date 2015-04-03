@@ -3,11 +3,12 @@
 
 import sys
 import click
-from onlineshop.onlineshop import parse_receipt,\
-                                    process_input_order,\
-                                    calculate_bill_contributions,\
-                                    is_order_assigned,\
-                                    get_order_purchases
+from onlineshop.onlineshop import session,\
+                                parse_receipt,\
+                                process_input_delivery,\
+                                is_delivery_assigned,\
+                                get_contributions,\
+                        Flatmate, Delivery, Purchase, FlatmatePurchase
 
 
 def assign_purchase(purchase):
@@ -21,7 +22,7 @@ def assign_purchase(purchase):
     return purchasers.split()
 
 
-def assign_order(purchases):
+def assign_delivery(purchases):
     """
     TODO: distinguish between unassigned purchases and purchases where
           we want to modify assignment
@@ -29,23 +30,30 @@ def assign_order(purchases):
     print('\nEnter flatmate identifier(s) (either a name, initial(s) or number that you keep to later.')
     print('Seperate the identifiers by a space.\n')
 
-    flatmates = get_flatmate_names()
+    flatmates = session.query(Flatmate.name).all()
     for purchase in purchases:
 
-        if purchase['price'] == 0.00:
+        if purchase.price == 0.00:
             continue
 
         purchasers = assign_purchase(purchase)
-        cost_each = purchase['price'] / len(purchasers)
+        cost_each = purchase.price / len(purchasers)
 
-        for flatmate in purchasers:
-            if flatmate not in flatmates:
-                flatmates.append(flatmate)
-                flatmate_id = add_new_flatmate(flatmate)
+        for name in purchasers:
+            if name not in flatmates:
+                flatmates.append(name)
+                new_flatmate = Flatmate(name=name.lower())
+                session.add(new_flatmate)
+                session.commit()
+                flatmate_id = new_flatmate.id
             else:
-                flatmate_id = get_flatmate_id(flatmate)
-            basket_item_id = add_new_basket_item(purchase['id'], flatmate_id)
-    print()
+                flatmate_id = session.query(Flatmate.id).filter_by(name=name).one()
+
+            session.add(FlatmatePurchase(
+                purchase_id = purchase.id,
+                flatmate_id = flatmate_id
+            ))
+            session.commit()
     return
 
 
@@ -54,19 +62,18 @@ def main(receipt_file):
     with receipt_file as f:
         receipt_text = f.read()
 
-    order_id = process_input_order(receipt_text)
+    delivery_id = process_input_delivery(receipt_text)
 
-    assigned = is_order_assigned(order_id)
+    assigned = is_delivery_assigned(delivery_id)
     if assigned:
         print('Shop is already assigned.')
         pass
     else:
-        purchases = get_order_purchases(order_id)
-        assign_order(purchases)
+        purchases = session.query(Purchase).filter_by(delivery_id=delivery_id).all()
+        assign_delivery(purchases)
 
     ## calculate individual contributions to bill
-    flatmate_contributions = calculate_bill_contributions(order_id)
-    for flatmate, flatmate_contribution in flatmate_contributions.items():
+    for flatmate, flatmate_contribution in get_contributions(delivery_id).items():
         print('{} spent £{:.2f}'.format(flatmate, flatmate_contribution))
 
     return

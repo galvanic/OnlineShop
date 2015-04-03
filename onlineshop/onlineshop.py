@@ -17,23 +17,18 @@ import re
 import sys
 import datetime as dt
 
-from .api import does_order_exist,\
-                    get_order_id,\
-                    add_new_order,\
-                    add_new_purchase,\
-                    is_order_assigned,\
-                    get_order_purchases,\
-                    get_flatmate_names,\
-                    add_new_flatmate,\
-                    get_flatmate_id,\
-                    add_new_basket_item,\
-                    get_order_baskets
+from .models import Flatmate, Delivery, Purchase, FlatmatePurchase
+
+from .helpers import session,\
+                        is_delivery_assigned,\
+                        get_contributions,\
+                        get_purchasers
 
 
 def parse_receipt(receipt_text):
     """Finds all the ordered items (=purchases) in the receipt text (eg. the
-    confirmation email for Ocado orders) using regular expressions.
-    Returns a tuple (dict of order information,
+    confirmation email for Ocado deliverys) using regular expressions.
+    Returns a tuple (dict of delivery information,
                     list of tuples (description, quantity, price)).
     """
     purchases = re.findall(r'(^\d\d?) (.+?) £(\d\d?\.\d\d)', receipt_text, re.MULTILINE)
@@ -77,45 +72,50 @@ def parse_receipt(receipt_text):
 
     total = subtotal + voucher + delivery_cost
 
-    order_info = {
-        'delivery_date': delivery_date,
+    delivery_info = {
+        'date': delivery_date,
         'total': total
     }
 
-    return order_info, purchases
+    return delivery_info, purchases
 
 
-def process_input_order(receipt_text):
+def process_input_delivery(receipt_text):
     """Parses the receipt text. Looks to see if a receipt with that
     date already exists in the database (assumed that there wouldn't
-    be multiple deliveries on the same day). If the order already
+    be multiple deliveries on the same day). If the delivery already
     exists, it's also assumed that its purchases will have already
-    been added to the database. Otherwise if the order isn't found in
+    been added to the database. Otherwise if the delivery isn't found in
     the database, the purchases are added to the database.
-    Returns the order id (whether the order existed and the id was
-    fetched from the database or the order was new and a new id was
+    Returns the delivery id (whether the delivery existed and the id was
+    fetched from the database or the delivery was new and a new id was
     created)
     """
-    order_info, purchases = parse_receipt(receipt_text)
+    delivery_info, purchases = parse_receipt(receipt_text)
 
-    order_exists = does_order_exist(order_info)
-    if order_exists:
-        order_id = get_order_id(order_info)
+    delivery = session.query(Delivery).filter_by(date=delivery_info['date']).first()
+
+    if delivery:
         print('Shop already exists.')
+        pass
+
     else:
-        order_id = add_new_order(order_info)
+        delivery = Delivery(
+            date = delivery_info['date'],
+            total = delivery_info['total']
+        )
+        session.add(delivery)
+        session.commit()
 
-        for purchase in purchases:
-            add_new_purchase(purchase, order_id)
+        purchases = [
+            Purchase(
+                description = p['description'],
+                quantity = p['quantity'],
+                price = p['price'],
+                delivery_id = delivery.id
+            )   for p in purchases
+        ]
+        session.add_all(purchases)
+        session.commit()
 
-    return order_id
-
-
-def calculate_bill_contributions(order_id):
-    """Given an order_id, run a query over database and return
-    a dictionary (flatmate UID: their total share of the order bill).
-
-    TODO: need better name for this function
-    """
-    flatmate_contributions = get_order_baskets(order_id)
-    return flatmate_contributions
+    return delivery.id

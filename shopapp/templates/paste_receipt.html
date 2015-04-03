@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Add order{% endblock %}
+{% block title %}Add delivery{% endblock %}
 {% block content %}
 
 
-<h1>Add order(s)</h1>
+<h1>Add a delivery</h1>
 
-<p>Paste you receipt into the text area below.</p>
+<p>Paste your receipt into the text area below.</p>
 
 <form action='{{ url_for("parse_receipt") }}' method='post' enctype='multipart/form-data' id='enter_receipt'>
 <textarea name='receipt'>{{ default_shop }}</textarea>
-  <input type='submit' id='add_order' name='submit_button' value='Add order'>
+  <input type='submit' id='add_delivery' name='submit_button' value='Add delivery' class='delivery'>
 </form>
 
 

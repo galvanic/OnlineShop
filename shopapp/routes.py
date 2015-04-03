@@ -7,6 +7,8 @@ from flask import render_template,\
                   url_for
 
 import onlineshop as api
+from onlineshop import session as db
+from onlineshop import Flatmate, Delivery, Purchase, FlatmatePurchase
 
 ###
 ### controllers: main pages
@@ -18,43 +20,25 @@ import onlineshop as api
 def index():
     """Renders the landing page with:
     - list of flatmates
-    - list of previous orders (just the delivery date)
+    - list of previous deliverys (just the delivery date)
     - button to form page to add flatmate(s)
-    - button to form page to add order
+    - button to form page to add delivery
     """
     return render_template('index.html',
-        flatmates = api.get_flatmate_names(),
-        orders    = api.get_orders()
+        flatmates = db.query(Flatmate).order_by(Flatmate.name).all(),
+        deliverys = db.query(Delivery).all()
     )
 
-
-@app.route('/order/<int:order_id>/')
-def display_order(order_id):
-    """Renders a page with:
-    - list of flatmates and their individual contribution to the bill
-    - list of purchases and the assigned flatmates next to each purchase
-    - link to form page to re-assign
-    """
-    if api.is_order_assigned:
-        baskets = api.get_order_baskets(order_id)
-
-    purchases = api.get_order_purchases(order_id)
-    purchases = [(p, api.get_purchasers(p['id'])) for p in purchases]
-
-    return render_template('display_order.html',
-        order     = api.get_order(order_id),
-        purchases = purchases,
-        baskets   = None
-    )
-
+##
+### flatmates
+##
 
 @app.route('/new/flatmate')
 def new_flatmates():
     """Renders a form page to add flatmates.
     """
-    existing_flatmates = api.get_flatmate_names()
     return render_template('add_flatmates.html',
-        flatmates = existing_flatmates
+        flatmates = db.query(Flatmate).order_by(Flatmate.name).all()
     )
 
 
@@ -62,12 +46,36 @@ def new_flatmates():
 def add_flatmates():
     """"""
     names = request.form['flatmates'].split()
-    for name in names:
-        api.add_new_flatmate(name)
+    db.add_all(Flatmate(name=name.lower()) for name in names)
+    db.commit()
     return redirect(url_for('index'))
 
+##
+### deliveries
+##
 
-@app.route('/new/order')
+@app.route('/delivery/<int:delivery_id>/')
+def display_delivery(delivery_id):
+    """Renders a page with:
+    - list of flatmates and their individual contribution to the bill
+    - list of purchases and the assigned flatmates next to each purchase
+    - link to form page to re-assign
+    """
+    baskets = None
+    if api.is_delivery_assigned(delivery_id):
+        baskets = api.get_contributions(delivery_id)
+
+    purchases = db.query(Purchase).filter_by(delivery_id=delivery_id).all()
+    purchases = [(p, api.get_purchasers(p.id)) for p in purchases]
+
+    return render_template('display_delivery.html',
+        delivery  = db.query(Delivery).filter_by(id=delivery_id).one(),
+        baskets   = baskets,
+        purchases = purchases
+    )
+
+
+@app.route('/new/delivery')
 def paste_receipt(default=True):
     """Renders a form page to paste the receipt text into.
     """
@@ -81,48 +89,62 @@ def paste_receipt(default=True):
         default_shop = default_shop
     )
 
-@app.route('/new/order/parse', methods=['POST'])
+
+@app.route('/new/delivery/parse', methods=['POST'])
 def parse_receipt():
     """Parses the receipt and redirects to the appropriate next step.
     """
     receipt_text = request.form['receipt']
-    order_id = api.process_input_order(receipt_text)
+    delivery_id = api.process_input_delivery(receipt_text)
 
-    assigned = api.is_order_assigned(order_id)
+    assigned = api.is_delivery_assigned(delivery_id)
     if assigned:
-        return redirect(url_for('display_order',
-            order_id = order_id
+        return redirect(url_for('display_delivery',
+            delivery_id = delivery_id
         ))
     else:
-        return redirect(url_for('assign_order',
-            order_id = order_id
+        return redirect(url_for('assign_delivery',
+            delivery_id = delivery_id
         ))
 
 
-@app.route('/order/<int:order_id>/assign')
-def assign_order(order_id):
+@app.route('/delivery/<int:delivery_id>/assign')
+def assign_delivery(delivery_id):
     """Renders a form page with a list of purchases and flatmate names 
     next to each purchase to click and assign.
     """
-    return render_template('assign_order.html',
-        order_id  = order_id,
-        purchases = api.get_order_purchases(order_id),
-        flatmates = api.get_flatmate_names()
+    return render_template('assign_delivery.html',
+        delivery_id = delivery_id,
+        purchases = db.query(Purchase).filter_by(delivery_id=delivery_id).all(),
+        flatmates = db.query(Flatmate).order_by(Flatmate.name).all()
     )
 
 
-@app.route('/order/<int:order_id>/assigning', methods=['POST'])
-def add_basket_items(order_id):
+@app.route('/delivery/<int:delivery_id>/assigning', methods=['POST'])
+def add_basket_items(delivery_id):
     """"""
-    purchase_ids = [p['id'] for p in api.get_order_purchases(order_id)]
-    for p_id in purchase_ids:
-        purchasers = request.form.getlist(str(p_id))
-        for name in purchasers:
-            f_id = api.get_flatmate_id(name)
-            api.add_new_basket_item(p_id, f_id)
+    purchases = db.query(Purchase).filter_by(delivery_id=delivery_id).all()
 
-    return redirect(url_for('display_order',
-        order_id = order_id
+    ## delete everything that had been assigned before for this delivery
+    for purchase in purchases:
+        flatmate_purchases = db.query(FlatmatePurchase).filter_by(purchase_id=purchase.id).all()
+        for fp in flatmate_purchases:
+            db.delete(fp)
+
+    ## (re-)assign
+    for purchase in purchases:
+        purchasers = request.form.getlist(str(purchase.id))
+        for name in purchasers:
+            flatmate = db.query(Flatmate).filter_by(name=name).one()
+
+            db.add(FlatmatePurchase(
+                purchase_id = purchase.id,
+                flatmate_id = flatmate.id
+            ))
+            db.commit()
+
+    return redirect(url_for('display_delivery',
+        delivery_id = delivery_id
     ))
 
 

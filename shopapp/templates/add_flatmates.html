@@ -5,18 +5,20 @@
 
 <h1>Add flatmate(s)</h1>
 
-<p>Existing flatmates:</p>
-<ul>
-{% for name in flatmates %}
-  <li>{{ name }}</li>
-{% endfor %}
-</ul>
+{% if flatmates %}
+  <p>Existing flatmates:</p>
+  <ul>
+  {% for flatmate in flatmates %}
+    <li>{{ flatmate.name|title }}</li>
+  {% endfor %}
+  </ul>
+{% endif %}
 
 <p>Enter the names of the flatmates you want to add seperated by a space.</p>
 
 <form action='{{ url_for("add_flatmates") }}' method='post' enctype='multipart/form-data' id='flatmates_form'>
   <input type='text' name='flatmates' />
-  <input type='submit' id='add_flatmates' name='submit_button' value='Add flatmate(s)'>
+  <input type='submit' id='add_flatmates' name='submit_button' value='Add flatmate(s)' class='flatmate' />
 </form>
 
 
