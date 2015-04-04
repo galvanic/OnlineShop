@@ -6,6 +6,8 @@ from flask import render_template,\
                   redirect,\
                   url_for
 
+from itertools import chain
+
 import onlineshop as api
 from onlineshop import session as db
 from onlineshop import Flatmate, Delivery, Purchase, Assignment
@@ -113,9 +115,19 @@ def assign_delivery(delivery_id):
     """Renders a form page with a list of purchases and flatmate names 
     next to each purchase to click and assign.
     """
+    purchases = db.query(Purchase).filter_by(delivery_id=delivery_id).all()
+
+    assigned_purchases = []
+    for p in purchases:
+        purchasers = list(chain(*db.query(Assignment.flatmate_id).filter_by(purchase_id=p.id).all()))
+        if p.description == 'Delivery costs' and not purchasers:
+            purchasers = list(chain(*db.query(Flatmate.id).all()))
+
+        assigned_purchases.append((p, purchasers))
+
     return render_template('assign_delivery.html',
         delivery_id = delivery_id,
-        purchases = db.query(Purchase).filter_by(delivery_id=delivery_id).all(),
+        purchases = assigned_purchases,
         flatmates = db.query(Flatmate).order_by(Flatmate.name).all()
     )
 

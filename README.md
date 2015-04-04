@@ -41,9 +41,11 @@ You can interact with the program through:
 
 Future Improvements
 -------------------
-- pre-fill previous assignments when re-assigning
 - date assignments
-- figure out different way of displaying names for when assigning delivery
+- give percentages to assignments
+- record who makes assignments (would require to have users) (?)
+- figure out different way of displaying people's names for when assigning delivery
+- have a page for a flatmate
 
 - find most important word in purchase (eg. 'Milk' in 'Full Cream Milk 2 Pints essential Waitrose')
 - Mail API to fetch shop receipt email automatically

@@ -7,18 +7,22 @@
 <form action='{{ url_for("add_assignments", delivery_id=delivery_id) }}' method='post' enctype='multipart/form-data' id='assign_purchases'>
 
   <table class='assign'>
-  {% for purchase in purchases %}
-    <tr>
-      <td>{{ purchase.quantity }}</td>
-      <td>{{ purchase.description }}</td>
-      <td>£ {{ purchase.price }}</td>
-      <td>
-        {% for flatmate in flatmates %}
-          <input type='checkbox' name='{{ purchase.id }}' value='{{ flatmate.name }}' id='{{ purchase.id }} {{ flatmate.name }}' />
-          <label for='{{ purchase.id }} {{ flatmate.name }}'>{{ flatmate.name[0]|title }}</label>
-        {% endfor %}
-      </td>
-    </tr>
+  {% for purchase, assigned_to in purchases %}
+  <tr>
+    <td>{{ purchase.quantity }}</td>
+    <td>{{ purchase.description }}</td>
+    <td>£ {{ purchase.price }}</td>
+    <td>
+      {% for flatmate in flatmates %}
+      <input type='checkbox' name='{{ purchase.id }}' value='{{ flatmate.name }}' id='{{ purchase.id }} {{ flatmate.name }}'
+      {% if flatmate.id in assigned_to %}
+      checked='true'
+      {% endif %}
+      />
+      <label for='{{ purchase.id }} {{ flatmate.name }}'>{{ flatmate.name[0]|title }}</label>
+      {% endfor %}
+    </td>
+  </tr>
   {% endfor %}
   </table>
 
