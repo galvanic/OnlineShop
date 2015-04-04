@@ -35,7 +35,7 @@ def is_delivery_assigned(delivery_id):
 def get_contributions(delivery_id):
     """Returns a dictionary {flatmate: total}
     """
-    with open('onlineshop/get_baskets.sql', 'r') as ifile:
+    with open('onlineshop/get_contributions.sql', 'r') as ifile:
         stmt = ifile.read()
 
     stmt = stmt.replace('?', ':delivery_id')

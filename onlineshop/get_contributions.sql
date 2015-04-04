@@ -14,5 +14,5 @@ from (
   group by purchase.id
 ) purchase_share
 inner join assignment on purchase_share.id = assignment.purchase_id
-inner join flatmate    on flatmate.id = assignment.flatmate_id
+inner join flatmate   on flatmate.id = assignment.flatmate_id
 group by flatmate.name;
