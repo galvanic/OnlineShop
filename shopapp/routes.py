@@ -91,8 +91,8 @@ def paste_receipt(default=True):
 
 
 @app.route('/new/delivery/parse', methods=['POST'])
-def parse_receipt():
-    """Parses the receipt and redirects to the appropriate next step.
+def process_receipt():
+    """Processes the receipt and redirects to the appropriate next step.
     """
     receipt_text = request.form['receipt']
     delivery_id = api.process_input_delivery(receipt_text)
