@@ -41,6 +41,11 @@ You can interact with the program through:
 
 Future Improvements
 -------------------
+- pre-fill previous assignments when re-assigning
+- date assignments
+- figure out different way of displaying names for when assigning delivery
+
+- find most important word in purchase (eg. 'Milk' in 'Full Cream Milk 2 Pints essential Waitrose')
 - Mail API to fetch shop receipt email automatically
 - Makes guesses on whose item it is based on previous shop assignments
 
