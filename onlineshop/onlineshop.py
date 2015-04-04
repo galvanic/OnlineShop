@@ -17,7 +17,7 @@ import re
 import sys
 import datetime as dt
 
-from .models import Flatmate, Delivery, Purchase, FlatmatePurchase
+from .models import Flatmate, Delivery, Purchase, Assignment
 
 from .helpers import session,\
                         is_delivery_assigned,\

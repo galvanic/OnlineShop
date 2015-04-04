@@ -8,7 +8,7 @@ from flask import render_template,\
 
 import onlineshop as api
 from onlineshop import session as db
-from onlineshop import Flatmate, Delivery, Purchase, FlatmatePurchase
+from onlineshop import Flatmate, Delivery, Purchase, Assignment
 
 ###
 ### controllers: main pages
@@ -121,14 +121,14 @@ def assign_delivery(delivery_id):
 
 
 @app.route('/delivery/<int:delivery_id>/assigning', methods=['POST'])
-def add_basket_items(delivery_id):
+def add_assignments(delivery_id):
     """"""
     purchases = db.query(Purchase).filter_by(delivery_id=delivery_id).all()
 
     ## delete everything that had been assigned before for this delivery
     for purchase in purchases:
-        flatmate_purchases = db.query(FlatmatePurchase).filter_by(purchase_id=purchase.id).all()
-        for fp in flatmate_purchases:
+        assignments = db.query(Assignment).filter_by(purchase_id=purchase.id).all()
+        for fp in assignments:
             db.delete(fp)
 
     ## (re-)assign
@@ -137,7 +137,7 @@ def add_basket_items(delivery_id):
         for name in purchasers:
             flatmate = db.query(Flatmate).filter_by(name=name).one()
 
-            db.add(FlatmatePurchase(
+            db.add(Assignment(
                 purchase_id = purchase.id,
                 flatmate_id = flatmate.id
             ))

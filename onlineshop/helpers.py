@@ -3,7 +3,7 @@
 """"""
 
 from .models import engine, DB_FILE,\
-                    Flatmate, Delivery, Purchase, FlatmatePurchase
+                    Flatmate, Delivery, Purchase, Assignment
 
 from sqlalchemy import text
 
@@ -14,13 +14,13 @@ session = Session()
 
 def is_delivery_assigned(delivery_id):
     """Are all the purchases of the delivery assigned ?
-    Is there a flatmate_purchase for all the purchases ?
+    Is there an Assignment for all the purchases ?
     """
     purchases = session.query(Purchase
         ).filter_by(delivery_id=delivery_id).all()
 
     for purchase in purchases:
-        purchase_is_assigned = session.query(FlatmatePurchase
+        purchase_is_assigned = session.query(Assignment
             ).filter_by(purchase_id=purchase.id).all()
         
         if not purchase_is_assigned:
@@ -48,12 +48,12 @@ def get_contributions(delivery_id):
 
 
 def get_purchasers(purchase_id):
-    """I.e. get flatmate_purchases with this purchase_id, and the 
+    """I.e. get assignments with this purchase_id, and the 
     corresponding flatmates (reminder: a purchase can be bought by
-    multiple flatmates so will appear as multiple flatmate_purchases)
+    multiple flatmates so will appear as multiple assignments)
     TODO: do this with a JOIN
     """
-    flatmate_ids = session.query(FlatmatePurchase.flatmate_id
+    flatmate_ids = session.query(Assignment.flatmate_id
         ).filter_by(purchase_id=purchase_id).all()
     flatmates = [session.query(Flatmate
         ).filter_by(id=f_id).one() for f_id, in flatmate_ids]

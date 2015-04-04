@@ -7,12 +7,12 @@ from (
   -- flatmates ordered the same item)
   select
     purchase.id as id,
-    purchase.price / count(distinct flatmate_purchase.flatmate_id) as price
+    purchase.price / count(distinct assignment.flatmate_id) as price
   from purchase
-  inner join flatmate_purchase on purchase.id = flatmate_purchase.purchase_id
+  inner join assignment on purchase.id = assignment.purchase_id
   where purchase.delivery_id = ?
   group by purchase.id
 ) purchase_share
-inner join flatmate_purchase on purchase_share.id = flatmate_purchase.purchase_id
-inner join flatmate    on flatmate.id = flatmate_purchase.flatmate_id
+inner join assignment on purchase_share.id = assignment.purchase_id
+inner join flatmate    on flatmate.id = assignment.flatmate_id
 group by flatmate.name;

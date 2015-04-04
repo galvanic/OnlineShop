@@ -8,7 +8,7 @@ from onlineshop.onlineshop import session,\
                                 process_input_delivery,\
                                 is_delivery_assigned,\
                                 get_contributions,\
-                        Flatmate, Delivery, Purchase, FlatmatePurchase
+                        Flatmate, Delivery, Purchase, Assignment
 
 
 def assign_purchase(purchase):
@@ -49,7 +49,7 @@ def assign_delivery(purchases):
             else:
                 flatmate_id = session.query(Flatmate.id).filter_by(name=name).one()
 
-            session.add(FlatmatePurchase(
+            session.add(Assignment(
                 purchase_id = purchase.id,
                 flatmate_id = flatmate_id
             ))

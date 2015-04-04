@@ -50,16 +50,16 @@ class Purchase(Base):
         return 'Purchase #{}: {} {} bought for {} on delivery #{}'.format(self.id, self.quantity, self.description, self.price, self.delivery_id)
 
 
-class FlatmatePurchase(Base):
+class Assignment(Base):
     """"""
-    __tablename__ = 'flatmate_purchase'
+    __tablename__ = 'assignment'
 
     id          = Column(Integer, primary_key=True)
     purchase_id = Column(Integer, ForeignKey('purchase.id'))
     flatmate_id = Column(Integer, ForeignKey('flatmate.id'))
 
     def __repr__(self):
-        return 'Flatmate purchase #{}: Flatmate {} bought a share of purchase {}'.format(self.id, self.flatmate_id, self.purchase_id)
+        return 'Assignment #{}: Flatmate {} bought a share of purchase {}'.format(self.id, self.flatmate_id, self.purchase_id)
 
 
 if __name__ == '__main__':

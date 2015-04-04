@@ -7,4 +7,4 @@ from .helpers import session,\
 						get_contributions,\
 						get_purchasers
 
-from .models import Flatmate, Delivery, Purchase, FlatmatePurchase
+from .models import Flatmate, Delivery, Purchase, Assignment

@@ -4,7 +4,7 @@
 
 <h1>Assign delivery {{ delivery_id }}</h1>
 
-<form action='{{ url_for("add_basket_items", delivery_id=delivery_id) }}' method='post' enctype='multipart/form-data' id='assign_purchases'>
+<form action='{{ url_for("add_assignments", delivery_id=delivery_id) }}' method='post' enctype='multipart/form-data' id='assign_purchases'>
 
   <table class='assign'>
   {% for purchase in purchases %}
