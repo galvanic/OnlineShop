@@ -5,7 +5,7 @@ select
   group_concat(purchase.description)
 from purchase
 inner join assignment on purchase.id = assignment.purchase_id
-inner join flatmate    on flatmate.id = assignment.flatmate_id
+inner join flatmate   on flatmate.id = assignment.flatmate_id
 where purchase.delivery_id = ?
 group by flatmate.name;
 
@@ -15,7 +15,7 @@ select
   group_concat(flatmate.name)
 from purchase
 left outer join assignment on purchase.id = assignment.purchase_id
-left outer join flatmate    on flatmate.id = assignment.flatmate_id
+left outer join flatmate   on flatmate.id = assignment.flatmate_id
 where purchase.delivery_id = ?
 group by purchase.id;
 
@@ -45,7 +45,7 @@ select
   round(sum(purchase_share.price), 2)
 from purchase_share
 inner join assignment on purchase_share.id = assignment.purchase_id
-inner join flatmate    on flatmate.id = assignment.flatmate_id
+inner join flatmate   on flatmate.id = assignment.flatmate_id
 group by flatmate.name;
 
 -- clearer version of above ^
@@ -65,7 +65,7 @@ from (
   group by purchase.id
 ) purchase_share
 inner join assignment on purchase_share.id = assignment.purchase_id
-inner join flatmate    on flatmate.id = assignment.flatmate_id
+inner join flatmate   on flatmate.id = assignment.flatmate_id
 group by flatmate.name;
 
 -- version also considering percentage of purchase for each flatmate
@@ -83,5 +83,5 @@ from (
   group by purchase.id, purchase.price
 ) purchase_count
 inner join assignment on purchase_count.id = assignment.purchase_id
-inner join flatmate on flatmate.id  =  assignment.flatmate_id
+inner join flatmate   on flatmate.id = assignment.flatmate_id
 group by flatmate.name;
