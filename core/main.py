@@ -16,7 +16,6 @@ import datetime as dt
 
 from .models import (
     engine,
-    DB_FILE,
     Flatmate,
     Delivery,
     Purchase,

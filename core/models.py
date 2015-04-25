@@ -1,8 +1,8 @@
 
 from sqlalchemy import create_engine
 
-DB_FILE = '/Users/jc5809/Dropbox/Programming/Projects/onlineshop/data/onlineshop.db'
-engine = create_engine('sqlite:///{}'.format(DB_FILE), echo=True)
+import os
+engine = create_engine(os.environ['DATABASE_URL'], echo=True)
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Date, Float, ForeignKey
