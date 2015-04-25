@@ -33,7 +33,7 @@ def is_delivery_assigned(delivery_id):
 
 
 def get_contributions(delivery_id):
-    """Returns a dictionary {flatmate: total}
+    """Returns a dictionary (flatmate_name, total)
     """
     with open('onlineshop/get_contributions.sql', 'r') as ifile:
         stmt = ifile.read()

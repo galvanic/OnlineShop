@@ -12,13 +12,14 @@ from onlineshop.onlineshop import session,\
 
 
 def assign_purchase(purchase):
-    """Given an item, prints the quantity and description of the purchase, waits
-    for user input and returns a list of purchasers' UIDs.
+    """Given a purchase (Purchase instance), prints the quantity and
+    description of the purchase, waits for user input and returns a
+    list of purchasers' UIDs.
     User input is expected to be anything that would uniquely identify a
     flatmate (from the other flatmates). Multiple flatmates can be entered
     by seperating their UID by a space.
     """
-    purchasers = input('Who bought {:50}'.format('{quantity} {description} ?'.format(**purchase)))
+    purchasers = input('Who bought {:50}'.format('{0.quantity} {0.description} ?'.format(purchase)))
     return purchasers.split()
 
 
@@ -73,7 +74,7 @@ def main(receipt_file):
         assign_delivery(purchases)
 
     ## calculate individual contributions to bill
-    for flatmate, flatmate_contribution in get_contributions(delivery_id).items():
+    for flatmate, flatmate_contribution in get_contributions(delivery_id):
         print('{} spent £{:.2f}'.format(flatmate, flatmate_contribution))
 
     return
