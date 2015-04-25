@@ -3,7 +3,7 @@
 
 import sys
 import click
-from onlineshop.onlineshop import session,\
+from core import session,\
                                 parse_receipt,\
                                 process_input_delivery,\
                                 is_delivery_assigned,\

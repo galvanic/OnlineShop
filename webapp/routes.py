@@ -1,5 +1,5 @@
 
-from shopapp import app
+from webapp import app
 from flask import render_template,\
                   send_from_directory,\
                   request,\
@@ -8,9 +8,9 @@ from flask import render_template,\
 
 from itertools import chain
 
-import onlineshop as api
-from onlineshop import session as db
-from onlineshop import Flatmate, Delivery, Purchase, Assignment
+import core as api
+from core import session as db
+from core import Flatmate, Delivery, Purchase, Assignment
 
 ###
 ### controllers: main pages
