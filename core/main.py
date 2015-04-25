@@ -52,12 +52,14 @@ def get_contributions(delivery_id):
         stmt = ifile.read()
 
     stmt = stmt.replace('?', ':delivery_id')
-    flatmate_contributions = db.session.query('f_name', 'f_total'
+    contribs = db.session.query('f_name', 'f_total'
         ).from_statement(text(stmt)
         ).params(delivery_id=delivery_id
         ).all()
 
-    return flatmate_contributions
+    contribs = [(name, round(total, 2)) for name, total in contribs]
+
+    return contribs
 
 
 def get_purchasers(purchase_id):

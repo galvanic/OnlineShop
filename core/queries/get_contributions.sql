@@ -1,7 +1,7 @@
 -- get each flatmate's basket total
 select
   flatmate.name as f_name,
-  round(sum(purchase_share.price), 2) as f_total
+  sum(purchase_share.price) as f_total
 from (
   -- get price of a share of a purchase (depending on how many
   -- flatmates ordered the same item)
