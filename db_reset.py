@@ -11,6 +11,8 @@ def reset_database(db):
     Base.metadata.drop_all(bind=db.engine)
     Base.metadata.create_all(bind=db.engine)
     db.session.commit()
+
+    print('Database reset done.')
     return
 
 if __name__ == '__main__':
