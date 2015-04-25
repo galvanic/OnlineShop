@@ -3,8 +3,8 @@
 
 import sys
 import click
+
 from core import (
-    session,
     parse_receipt,
     process_input_delivery,
     is_delivery_assigned,
@@ -13,8 +13,8 @@ from core import (
     Delivery,
     Purchase,
     Assignment,
+    db,
 )
-
 
 def assign_purchase(purchase):
     """Given a purchase (Purchase instance), prints the quantity and
@@ -36,7 +36,7 @@ def assign_delivery(purchases):
     print('\nEnter flatmate identifier(s) (either a name, initial(s) or number that you keep to later.')
     print('Seperate the identifiers by a space.\n')
 
-    flatmates = session.query(Flatmate.name).all()
+    flatmates = db.session.query(Flatmate.name).all()
     for purchase in purchases:
 
         if purchase.price == 0.00:
@@ -49,17 +49,17 @@ def assign_delivery(purchases):
             if name not in flatmates:
                 flatmates.append(name)
                 new_flatmate = Flatmate(name=name.lower())
-                session.add(new_flatmate)
-                session.commit()
+                db.session.add(new_flatmate)
+                db.session.commit()
                 flatmate_id = new_flatmate.id
             else:
-                flatmate_id = session.query(Flatmate.id).filter_by(name=name).one()
+                flatmate_id = db.session.query(Flatmate.id).filter_by(name=name).one()
 
-            session.add(Assignment(
+            db.session.add(Assignment(
                 purchase_id = purchase.id,
                 flatmate_id = flatmate_id
             ))
-            session.commit()
+            db.session.commit()
     return
 
 
@@ -75,7 +75,7 @@ def main(receipt_file):
         print('Shop is already assigned.')
         pass
     else:
-        purchases = session.query(Purchase).filter_by(delivery_id=delivery_id).all()
+        purchases = db.session.query(Purchase).filter_by(delivery_id=delivery_id).all()
         assign_delivery(purchases)
 
     ## calculate individual contributions to bill

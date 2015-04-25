@@ -1,12 +1,7 @@
 
-from sqlalchemy import create_engine
-
-import os
-engine = create_engine(os.environ['DATABASE_URL'], echo=True)
-
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Date, Float, ForeignKey
 
+from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
@@ -60,8 +55,3 @@ class Assignment(Base):
 
     def __repr__(self):
         return 'Assignment #{}: Flatmate {} bought a share of purchase {}'.format(self.id, self.flatmate_id, self.purchase_id)
-
-
-if __name__ == '__main__':
-
-    Base.metadata.create_all(engine)

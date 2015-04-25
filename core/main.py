@@ -15,18 +15,13 @@ import sys
 import datetime as dt
 
 from .models import (
-    engine,
     Flatmate,
     Delivery,
     Purchase,
     Assignment,
 )
-
 from sqlalchemy import text
-
-from sqlalchemy.orm import sessionmaker
-Session = sessionmaker(bind=engine)
-session = Session()
+from core import db
 
 ### HELPERS
 
@@ -34,11 +29,11 @@ def is_delivery_assigned(delivery_id):
     """Are all the purchases of the delivery assigned ?
     Is there an Assignment for all the purchases ?
     """
-    purchases = session.query(Purchase
+    purchases = db.session.query(Purchase
         ).filter_by(delivery_id=delivery_id).all()
 
     for purchase in purchases:
-        purchase_is_assigned = session.query(Assignment
+        purchase_is_assigned = db.session.query(Assignment
             ).filter_by(purchase_id=purchase.id).all()
         
         if not purchase_is_assigned:
@@ -57,7 +52,7 @@ def get_contributions(delivery_id):
         stmt = ifile.read()
 
     stmt = stmt.replace('?', ':delivery_id')
-    flatmate_contributions = session.query('f_name', 'f_total'
+    flatmate_contributions = db.session.query('f_name', 'f_total'
         ).from_statement(text(stmt)
         ).params(delivery_id=delivery_id
         ).all()
@@ -71,9 +66,9 @@ def get_purchasers(purchase_id):
     multiple flatmates so will appear as multiple assignments)
     TODO: do this with a JOIN
     """
-    flatmate_ids = session.query(Assignment.flatmate_id
+    flatmate_ids = db.session.query(Assignment.flatmate_id
         ).filter_by(purchase_id=purchase_id).all()
-    flatmates = [session.query(Flatmate
+    flatmates = [db.session.query(Flatmate
         ).filter_by(id=f_id).one() for f_id, in flatmate_ids]
     flatmates = sorted(flatmates, key=lambda f: f.name)
     return flatmates
@@ -149,7 +144,7 @@ def process_input_delivery(receipt_text):
     """
     delivery_info, purchases = parse_receipt(receipt_text)
 
-    delivery = session.query(Delivery).filter_by(date=delivery_info['date']).first()
+    delivery = db.session.query(Delivery).filter_by(date=delivery_info['date']).first()
 
     if delivery:
         print('Shop already exists.')
@@ -160,8 +155,8 @@ def process_input_delivery(receipt_text):
             date = delivery_info['date'],
             total = delivery_info['total']
         )
-        session.add(new_delivery)
-        session.commit()
+        db.session.add(new_delivery)
+        db.session.commit()
 
         purchases = [
             Purchase(
@@ -171,8 +166,8 @@ def process_input_delivery(receipt_text):
                 delivery_id = new_delivery.id
             )   for p in purchases
         ]
-        session.add_all(purchases)
-        session.commit()
+        db.session.add_all(purchases)
+        db.session.commit()
 
         delivery = new_delivery
 
