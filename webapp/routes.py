@@ -54,7 +54,9 @@ def new_flatmates():
 
 @app.route('/new/flatmate/add', methods=['POST'])
 def add_flatmates():
-    """"""
+    """Processes names entered into the form and adds the new
+    flatmates to the database.
+    """
     names = request.form['flatmates'].split()
     db.session.add_all(Flatmate(name=name.lower()) for name in names)
     db.session.commit()
@@ -142,7 +144,9 @@ def assign_delivery(delivery_id):
 
 @app.route('/delivery/<int:delivery_id>/assigning', methods=['POST'])
 def add_assignments(delivery_id):
-    """"""
+    """Processes assignments from the form and adds the new
+    assignments to the database.
+    """
     purchases = db.session.query(Purchase).filter_by(delivery_id=delivery_id).all()
 
     ## delete everything that had been assigned before for this delivery
