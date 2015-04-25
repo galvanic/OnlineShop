@@ -14,8 +14,14 @@ import re
 import sys
 import datetime as dt
 
-from .models import engine, DB_FILE,\
-                    Flatmate, Delivery, Purchase, Assignment
+from .models import (
+    engine,
+    DB_FILE,
+    Flatmate,
+    Delivery,
+    Purchase,
+    Assignment,
+)
 
 from sqlalchemy import text
 

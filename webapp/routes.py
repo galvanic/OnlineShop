@@ -1,16 +1,23 @@
 
 from webapp import app
-from flask import render_template,\
-                  send_from_directory,\
-                  request,\
-                  redirect,\
-                  url_for
+from flask import (
+    render_template,
+    send_from_directory,
+    request,
+    redirect,
+    url_for,
+)
 
 from itertools import chain
 
 import core as api
 from core import session as db
-from core import Flatmate, Delivery, Purchase, Assignment
+from core import (
+    Flatmate,
+    Delivery,
+    Purchase,
+    Assignment,
+)
 
 ###
 ### controllers: main pages

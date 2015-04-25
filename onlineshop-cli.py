@@ -3,12 +3,17 @@
 
 import sys
 import click
-from core import session,\
-                                parse_receipt,\
-                                process_input_delivery,\
-                                is_delivery_assigned,\
-                                get_contributions,\
-                        Flatmate, Delivery, Purchase, Assignment
+from core import (
+    session,
+    parse_receipt,
+    process_input_delivery,
+    is_delivery_assigned,
+    get_contributions,
+    Flatmate,
+    Delivery,
+    Purchase,
+    Assignment,
+)
 
 
 def assign_purchase(purchase):
