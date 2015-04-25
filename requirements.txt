@@ -9,3 +9,4 @@ click==3.3
 docopt==0.6.2
 gunicorn==19.3.0
 itsdangerous==0.24
+psycopg2==2.6
