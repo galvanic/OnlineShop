@@ -1,8 +1,7 @@
 # for use for any app that imports the onlineshop package
 from .main import parse_receipt,\
-						process_input_delivery
-
-from .helpers import session,\
+						process_input_delivery,\
+						session,\
 						is_delivery_assigned,\
 						get_contributions,\
 						get_purchasers
