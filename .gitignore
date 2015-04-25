@@ -1,5 +1,5 @@
 *.pyc
-data/receipts/
+data/
 access.txt
 consumer.txt
 *.csv
