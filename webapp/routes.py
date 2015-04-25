@@ -7,16 +7,18 @@ from flask import (
     redirect,
     url_for,
 )
-
-from itertools import chain
-
-import core as api
 from core import (
+    parse_receipt,
+    process_input_delivery,
+    is_delivery_assigned,
+    get_contributions,
+    get_purchasers,
     Flatmate,
     Delivery,
     Purchase,
     Assignment,
 )
+from itertools import chain
 
 ###
 ### controllers: main pages
@@ -70,11 +72,11 @@ def display_delivery(delivery_id):
     - link to form page to re-assign
     """
     baskets = None
-    if api.is_delivery_assigned(delivery_id):
-        baskets = api.get_contributions(delivery_id)
+    if is_delivery_assigned(delivery_id):
+        baskets = get_contributions(delivery_id)
 
     purchases = db.session.query(Purchase).filter_by(delivery_id=delivery_id).all()
-    purchases = [(p, api.get_purchasers(p.id)) for p in purchases]
+    purchases = [(p, get_purchasers(p.id)) for p in purchases]
 
     return render_template('display_delivery.html',
         delivery  = db.session.query(Delivery).filter_by(id=delivery_id).one(),
@@ -103,9 +105,9 @@ def process_receipt():
     """Processes the receipt and redirects to the appropriate next step.
     """
     receipt_text = request.form['receipt']
-    delivery_id = api.process_input_delivery(receipt_text)
+    delivery_id = process_input_delivery(receipt_text)
 
-    assigned = api.is_delivery_assigned(delivery_id)
+    assigned = is_delivery_assigned(delivery_id)
     if assigned:
         return redirect(url_for('display_delivery',
             delivery_id = delivery_id
